@@ -139,11 +139,15 @@ function buildSvg(
     <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
       <circle cx="1.3" cy="1.3" r="1.3" fill="rgba(255,255,255,0.10)"/>
     </pattern>
+    <clipPath id="card-clip">
+      <rect width="${W}" height="${H}" rx="20"/>
+    </clipPath>
   </defs>
 
   <!-- Background -->
-  <rect width="${W}" height="${H}" fill="url(#bg)"/>
-  <rect width="${W}" height="${H}" fill="url(#dots)"/>
+  <rect width="${W}" height="${H}" rx="20" fill="url(#bg)"/>
+  <rect width="${W}" height="${H}" rx="20" fill="url(#dots)"/>
+  <g clip-path="url(#card-clip)">
 
   <!-- Album art -->
   ${albumSvg}
@@ -166,6 +170,7 @@ function buildSvg(
   <!-- Artist -->
   <text x="${contentX}" y="${artistY}" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="13" fill="${artistFill}">${artistText}</text>
   ${progressSvg}
+  </g>
 </svg>`;
 }
 
