@@ -60,10 +60,13 @@ function svgDoc(w: number, h: number, theme: Theme, body: string): string {
     <pattern id="dots" x="0" y="0" width="26" height="26" patternUnits="userSpaceOnUse">
       <circle cx="1.3" cy="1.3" r="1.3" fill="rgba(255,255,255,0.10)"/>
     </pattern>
+    <clipPath id="card-clip">
+      <rect width="${w}" height="${h}" rx="20"/>
+    </clipPath>
   </defs>
-  <rect width="${w}" height="${h}" fill="url(#bg)"/>
-  <rect width="${w}" height="${h}" fill="url(#dots)"/>
-  <g font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif">
+  <rect width="${w}" height="${h}" rx="20" fill="url(#bg)"/>
+  <rect width="${w}" height="${h}" rx="20" fill="url(#dots)"/>
+  <g font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" clip-path="url(#card-clip)">
     ${body}
   </g>
 </svg>`;

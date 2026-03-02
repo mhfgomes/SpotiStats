@@ -41,6 +41,7 @@ export function RecapCard({ cardRef, themeKey = "ocean" }: RecapCardProps) {
     padding: "32px",
     position: "relative",
     overflow: "hidden",
+    borderRadius: 20,
     fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
     color: theme.text,
   };
