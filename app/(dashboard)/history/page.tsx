@@ -13,6 +13,8 @@ export default function HistoryPage() {
         <div className="flex items-center gap-4 px-3 py-2 border-b border-white/5 text-xs text-spotify-subtext uppercase tracking-wider">
           <span className="w-10 shrink-0" />
           <span className="flex-1">Track</span>
+          <span className="hidden md:block w-40 shrink-0">Artist</span>
+          <span className="hidden lg:block w-40 shrink-0">Album</span>
           <span className="hidden sm:block">Played at</span>
         </div>
         <RecentlyPlayed />
