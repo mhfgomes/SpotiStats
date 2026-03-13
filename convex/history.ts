@@ -22,18 +22,19 @@ export const appendPlayHistory = internalMutation({
     newCursor: v.string(),
   },
   handler: async (ctx, { spotifyUserId, items, newCursor }) => {
-    for (const item of items) {
-      const existing = await ctx.db
-        .query("playHistory")
-        .withIndex("by_user_playedAt", (q) =>
-          q.eq("spotifyUserId", spotifyUserId).eq("playedAt", item.playedAt)
-        )
-        .first();
-
-      if (!existing) {
-        await ctx.db.insert("playHistory", item);
-      }
-    }
+    const minPlayedAt = Math.min(...items.map((i) => i.playedAt));
+    const existing = await ctx.db
+      .query("playHistory")
+      .withIndex("by_user_playedAt", (q) =>
+        q.eq("spotifyUserId", spotifyUserId).gte("playedAt", minPlayedAt)
+      )
+      .collect();
+    const existingTimestamps = new Set(existing.map((e) => e.playedAt));
+    await Promise.all(
+      items
+        .filter((item) => !existingTimestamps.has(item.playedAt))
+        .map((item) => ctx.db.insert("playHistory", item))
+    );
 
     const cursorDoc = await ctx.db
       .query("syncCursors")

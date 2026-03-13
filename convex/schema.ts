@@ -26,7 +26,7 @@ export default defineSchema({
     artistSpotifyIds: v.array(v.string()),
     durationMs: v.number(),
     explicit: v.boolean(),
-    trackUri: v.string(),
+    trackUri: v.optional(v.string()),
     externalUrl: v.string(),
     popularity: v.number(),
     syncedAt: v.number(),
@@ -42,7 +42,7 @@ export default defineSchema({
     artistName: v.string(),
     genres: v.array(v.string()),
     imageUrl: v.optional(v.string()),
-    artistUri: v.string(),
+    artistUri: v.optional(v.string()),
     externalUrl: v.string(),
     syncedAt: v.number(),
   })

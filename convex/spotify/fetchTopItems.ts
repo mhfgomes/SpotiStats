@@ -34,7 +34,6 @@ export async function syncTopTracks(
       artistSpotifyIds: track.artists.map((a: SpotifyArtistSimple) => a.id),
       durationMs: track.duration_ms,
       explicit: track.explicit,
-      trackUri: track.uri,
       externalUrl: track.external_urls.spotify,
       popularity: track.popularity,
       syncedAt: Date.now(),
@@ -64,7 +63,6 @@ export async function syncTopArtists(
       artistName: artist.name,
       genres: artist.genres,
       imageUrl: artist.images[0]?.url,
-      artistUri: artist.uri,
       externalUrl: artist.external_urls.spotify,
       syncedAt: Date.now(),
     }));

@@ -9,7 +9,6 @@ const artistValidator = v.object({
   artistName: v.string(),
   genres: v.array(v.string()),
   imageUrl: v.optional(v.string()),
-  artistUri: v.string(),
   externalUrl: v.string(),
   syncedAt: v.number(),
 });

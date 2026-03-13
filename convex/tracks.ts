@@ -14,7 +14,6 @@ const trackValidator = v.object({
   artistSpotifyIds: v.array(v.string()),
   durationMs: v.number(),
   explicit: v.boolean(),
-  trackUri: v.string(),
   externalUrl: v.string(),
   popularity: v.number(),
   syncedAt: v.number(),
