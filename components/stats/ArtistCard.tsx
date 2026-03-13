@@ -24,7 +24,12 @@ export function ArtistCard({
       </span>
 
       {/* Artist image */}
-      <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 bg-spotify-card">
+      <a
+        href={externalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 bg-spotify-card block"
+      >
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -38,11 +43,18 @@ export function ArtistCard({
             <span className="text-lg">🎤</span>
           </div>
         )}
-      </div>
+      </a>
 
       {/* Artist name */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{artistName}</p>
+        <a
+          href={externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium truncate hover:text-spotify-green transition-colors block"
+        >
+          {artistName}
+        </a>
       </div>
 
       {/* Genres column */}

@@ -55,8 +55,10 @@ export function TopTracksList({ timeRange }: TopTracksListProps) {
           rank={track.rank}
           trackName={track.trackName}
           albumName={track.albumName}
+          albumExternalUrl={track.albumExternalUrl}
           albumImageUrl={track.albumImageUrl}
           artistNames={track.artistNames}
+          artistSpotifyIds={track.artistSpotifyIds}
           durationMs={track.durationMs}
           explicit={track.explicit}
           externalUrl={track.externalUrl}

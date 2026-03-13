@@ -70,7 +70,7 @@ export function RecentlyPlayed() {
             href={`https://open.spotify.com/track/${item.trackSpotifyId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 min-w-0 hover:underline"
+            className="flex-1 min-w-0 hover:text-spotify-green transition-colors"
           >
             <p className="text-sm font-medium truncate">{item.trackName}</p>
           </a>
@@ -86,7 +86,7 @@ export function RecentlyPlayed() {
                     href={`https://open.spotify.com/artist/${artistId}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-white hover:underline transition-colors"
+                    className="hover:text-spotify-green transition-colors"
                   >
                     {name}{idx < item.artistNames.length - 1 ? ", " : ""}
                   </a>
@@ -106,7 +106,7 @@ export function RecentlyPlayed() {
                 href={`https://open.spotify.com/album/${item.albumSpotifyId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-spotify-subtext truncate block hover:text-white hover:underline transition-colors"
+                className="text-xs text-spotify-subtext truncate block hover:text-spotify-green transition-colors"
               >
                 {item.albumName}
               </a>

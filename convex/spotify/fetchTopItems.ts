@@ -28,6 +28,7 @@ export async function syncTopTracks(
       trackSpotifyId: track.id,
       trackName: track.name,
       albumName: track.album.name,
+      albumExternalUrl: track.album.external_urls?.spotify,
       albumImageUrl: track.album.images[0]?.url,
       artistNames: track.artists.map((a: SpotifyArtistSimple) => a.name),
       artistSpotifyIds: track.artists.map((a: SpotifyArtistSimple) => a.id),
