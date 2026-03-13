@@ -6,8 +6,10 @@ interface TrackCardProps {
   rank: number;
   trackName: string;
   albumName: string;
+  albumExternalUrl?: string;
   albumImageUrl?: string;
   artistNames: string[];
+  artistSpotifyIds: string[];
   durationMs: number;
   explicit: boolean;
   externalUrl: string;
@@ -18,8 +20,10 @@ export function TrackCard({
   rank,
   trackName,
   albumName,
+  albumExternalUrl,
   albumImageUrl,
   artistNames,
+  artistSpotifyIds,
   durationMs,
   explicit,
   externalUrl,
@@ -33,7 +37,12 @@ export function TrackCard({
       </span>
 
       {/* Album art */}
-      <div className="relative w-12 h-12 rounded overflow-hidden shrink-0 bg-spotify-card">
+      <a
+        href={externalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative w-12 h-12 rounded overflow-hidden shrink-0 bg-spotify-card block"
+      >
         {albumImageUrl ? (
           <Image
             src={albumImageUrl}
@@ -47,12 +56,19 @@ export function TrackCard({
             <span className="text-spotify-subtext text-xs">♪</span>
           </div>
         )}
-      </div>
+      </a>
 
       {/* Track info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <p className="text-sm font-medium truncate">{trackName}</p>
+          <a
+            href={externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium truncate hover:text-spotify-green transition-colors"
+          >
+            {trackName}
+          </a>
           {explicit && (
             <span className="text-[10px] bg-spotify-subtext/30 text-spotify-subtext px-1 py-0.5 rounded font-medium shrink-0">
               E
@@ -60,14 +76,37 @@ export function TrackCard({
           )}
         </div>
         <p className="text-xs text-spotify-subtext truncate">
-          {artistNames.join(", ")}
+          {artistNames.map((name, i) => (
+            <span key={i}>
+              {i > 0 && ", "}
+              <a
+                href={`https://open.spotify.com/artist/${artistSpotifyIds[i]}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-spotify-green transition-colors"
+              >
+                {name}
+              </a>
+            </span>
+          ))}
         </p>
       </div>
 
       {/* Album name (hidden on small screens) */}
-      <p className="text-xs text-spotify-subtext truncate hidden md:block max-w-[160px]">
-        {albumName}
-      </p>
+      {albumExternalUrl ? (
+        <a
+          href={albumExternalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-spotify-subtext truncate hidden md:block w-40 shrink-0 hover:text-spotify-green transition-colors"
+        >
+          {albumName}
+        </a>
+      ) : (
+        <p className="text-xs text-spotify-subtext truncate hidden md:block w-40 shrink-0">
+          {albumName}
+        </p>
+      )}
 
       {/* Popularity bar */}
       <div className="hidden lg:flex items-center gap-2 w-24 shrink-0">
@@ -82,11 +121,13 @@ export function TrackCard({
         </span>
       </div>
 
-      {/* Duration + link */}
-      <div className="flex items-center gap-3 shrink-0">
-        <span className="text-xs text-spotify-subtext hidden sm:block">
-          {formatDuration(durationMs)}
-        </span>
+      {/* Duration */}
+      <span className="text-xs text-spotify-subtext hidden sm:block w-10 shrink-0 text-right">
+        {formatDuration(durationMs)}
+      </span>
+
+      {/* Link */}
+      <div className="w-5 shrink-0 flex items-center justify-center">
         <a
           href={externalUrl}
           target="_blank"
