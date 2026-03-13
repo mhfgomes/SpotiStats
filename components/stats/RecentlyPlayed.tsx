@@ -76,7 +76,7 @@ export function RecentlyPlayed() {
           </a>
 
           {/* Artists */}
-          <div className="hidden md:flex items-center gap-1 w-40 shrink-0 min-w-0">
+          <div className="hidden md:flex items-center gap-1 flex-1 min-w-0">
             <p className="text-xs text-spotify-subtext truncate">
               {item.artistNames.map((name, idx) => {
                 const artistId = item.artistSpotifyIds?.[idx];
@@ -100,7 +100,7 @@ export function RecentlyPlayed() {
           </div>
 
           {/* Album */}
-          <div className="hidden lg:block w-40 shrink-0 min-w-0">
+          <div className="hidden lg:block flex-1 min-w-0">
             {item.albumSpotifyId ? (
               <a
                 href={`https://open.spotify.com/album/${item.albumSpotifyId}`}
