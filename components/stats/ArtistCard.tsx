@@ -1,5 +1,9 @@
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
+import {
+  RankChangeBadge,
+  type RankChange,
+} from "@/components/stats/RankChangeBadge";
 
 interface ArtistCardProps {
   rank: number;
@@ -7,6 +11,7 @@ interface ArtistCardProps {
   genres: string[];
   imageUrl?: string;
   externalUrl: string;
+  rankChange?: RankChange | null;
 }
 
 export function ArtistCard({
@@ -15,13 +20,18 @@ export function ArtistCard({
   genres,
   imageUrl,
   externalUrl,
+  rankChange,
 }: ArtistCardProps) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
-      {/* Rank */}
-      <span className="text-spotify-subtext text-sm font-mono w-6 text-right shrink-0">
-        {rank}
-      </span>
+      <div className="flex w-12 shrink-0 items-center gap-2">
+        <div className="flex w-4 justify-center">
+          <RankChangeBadge change={rankChange ?? null} />
+        </div>
+        <span className="text-spotify-subtext text-sm font-mono w-6 text-right shrink-0">
+          {rank}
+        </span>
+      </div>
 
       {/* Artist image */}
       <a

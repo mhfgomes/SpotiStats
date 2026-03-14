@@ -20,6 +20,7 @@ import type * as spotify_sync from "../spotify/sync.js";
 import type * as spotify_tokenHelper from "../spotify/tokenHelper.js";
 import type * as syncStatus from "../syncStatus.js";
 import type * as tasteProfile from "../tasteProfile.js";
+import type * as topHistory from "../topHistory.js";
 import type * as tracks from "../tracks.js";
 import type * as users from "../users.js";
 
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   "spotify/tokenHelper": typeof spotify_tokenHelper;
   syncStatus: typeof syncStatus;
   tasteProfile: typeof tasteProfile;
+  topHistory: typeof topHistory;
   tracks: typeof tracks;
   users: typeof users;
 }>;

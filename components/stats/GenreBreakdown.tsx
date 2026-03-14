@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TimeRange } from "@/types/spotify";
+import { getRankChange, RankChangeBadge } from "./RankChangeBadge";
 
 interface GenreBreakdownProps {
   timeRange: TimeRange;
@@ -40,6 +41,10 @@ const CustomTooltip = ({
 
 export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
   const genres = useQuery(api.artists.getTopGenres, { timeRange });
+  const history = useQuery(api.topHistory.getTopGenresHistory, {
+    timeRange,
+    limit: 2,
+  });
 
   if (genres === undefined) {
     const barWidths = ["85%", "72%", "65%", "58%", "50%", "44%", "38%", "32%", "26%", "20%"];
@@ -64,42 +69,89 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
   }
 
   const top15 = genres.slice(0, 15);
+  const previousSnapshot = history?.[1];
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <BarChart
-        data={top15}
-        layout="vertical"
-        margin={{ top: 0, right: 24, left: 0, bottom: 0 }}
-      >
-        <XAxis
-          type="number"
-          axisLine={false}
-          tickLine={false}
-          tick={{ fill: "#B3B3B3", fontSize: 11 }}
-        />
-        <YAxis
-          dataKey="genre"
-          type="category"
-          width={140}
-          axisLine={false}
-          tickLine={false}
-          tick={{ fill: "#fff", fontSize: 12 }}
-        />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-        <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-          {top15.map((entry: { genre: string; count: number }, index: number) => (
-            <Cell
-              key={entry.genre}
-              fill={
-                index === 0
-                  ? "#1DB954"
-                  : `rgba(29,185,84,${Math.max(0.2, 1 - index * 0.06)})`
-              }
-            />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div className="space-y-6">
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart
+          data={top15}
+          layout="vertical"
+          margin={{ top: 0, right: 24, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            type="number"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#B3B3B3", fontSize: 11 }}
+          />
+          <YAxis
+            dataKey="genre"
+            type="category"
+            width={140}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#fff", fontSize: 12 }}
+          />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+          <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+            {top15.map((entry: { genre: string; count: number }, index: number) => (
+              <Cell
+                key={entry.genre}
+                fill={
+                  index === 0
+                    ? "#1DB954"
+                    : `rgba(29,185,84,${Math.max(0.2, 1 - index * 0.06)})`
+                }
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+
+      <div className="rounded-xl border border-white/8 bg-white/[0.03]">
+        <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
+          <p className="text-sm font-medium">Relative Position</p>
+          <p className="text-xs text-spotify-subtext">
+            Compared with the previous sync
+          </p>
+        </div>
+
+        <div className="divide-y divide-white/5">
+          {top15.slice(0, 10).map((genre, index) => {
+            const previousRank =
+              previousSnapshot === undefined
+                ? undefined
+                : previousSnapshot.items.find(
+                    (item) => item.genre === genre.genre
+                  )?.rank ?? null;
+
+            return (
+              <div
+                key={genre.genre}
+                className="flex items-center gap-3 px-4 py-3"
+              >
+                <div className="flex w-12 shrink-0 items-center gap-2">
+                  <div className="flex w-4 justify-center">
+                    <RankChangeBadge
+                      change={getRankChange(index + 1, previousRank)}
+                    />
+                  </div>
+                  <span className="w-6 text-right font-mono text-sm text-spotify-subtext">
+                    {index + 1}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{genre.genre}</p>
+                  <p className="text-xs text-spotify-subtext">
+                    Score {genre.count}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

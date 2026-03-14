@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { formatDuration } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
+import {
+  RankChangeBadge,
+  type RankChange,
+} from "@/components/stats/RankChangeBadge";
 
 interface TrackCardProps {
   rank: number;
@@ -14,6 +18,7 @@ interface TrackCardProps {
   explicit: boolean;
   externalUrl: string;
   popularity: number;
+  rankChange?: RankChange | null;
 }
 
 export function TrackCard({
@@ -28,13 +33,19 @@ export function TrackCard({
   explicit,
   externalUrl,
   popularity,
+  rankChange,
 }: TrackCardProps) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
-      {/* Rank */}
-      <span className="text-spotify-subtext text-sm font-mono w-6 text-right shrink-0">
-        {rank}
-      </span>
+      <div className="flex w-12 shrink-0 items-center gap-2">
+        <div className="flex w-4 justify-center">
+          <RankChangeBadge change={rankChange ?? null} />
+        </div>
+        {/* Rank */}
+        <span className="text-spotify-subtext text-sm font-mono w-6 text-right shrink-0">
+          {rank}
+        </span>
+      </div>
 
       {/* Album art */}
       <a

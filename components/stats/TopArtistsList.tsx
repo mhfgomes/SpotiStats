@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { ArtistCard } from "./ArtistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TimeRange } from "@/types/spotify";
+import { getRankChange } from "./RankChangeBadge";
 
 interface TopArtistsListProps {
   timeRange: TimeRange;
@@ -12,13 +13,20 @@ interface TopArtistsListProps {
 
 export function TopArtistsList({ timeRange }: TopArtistsListProps) {
   const artists = useQuery(api.artists.getTopArtists, { timeRange });
+  const history = useQuery(api.topHistory.getTopArtistsHistory, {
+    timeRange,
+    limit: 2,
+  });
 
   if (artists === undefined) {
     return (
       <div className="space-y-2">
         {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} className="flex items-center gap-4 p-3">
-            <Skeleton className="w-6 h-4" />
+            <div className="flex w-12 shrink-0 items-center gap-2">
+              <Skeleton className="h-4 w-4 rounded-full" />
+              <Skeleton className="w-6 h-4" />
+            </div>
             <Skeleton className="w-12 h-12 rounded-full" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-4 w-36" />
@@ -43,16 +51,27 @@ export function TopArtistsList({ timeRange }: TopArtistsListProps) {
 
   return (
     <div className="divide-y divide-white/5">
-      {(artists as NonNullable<typeof artists>).map((artist) => (
-        <ArtistCard
-          key={artist._id}
-          rank={artist.rank}
-          artistName={artist.artistName}
-          genres={artist.genres}
-          imageUrl={artist.imageUrl}
-          externalUrl={artist.externalUrl}
-        />
-      ))}
+      {(artists as NonNullable<typeof artists>).map((artist) => {
+        const previousSnapshot = history?.[1];
+        const previousRank =
+          previousSnapshot === undefined
+            ? undefined
+            : previousSnapshot.items.find(
+                (item) => item.artistSpotifyId === artist.artistSpotifyId
+              )?.rank ?? null;
+
+        return (
+          <ArtistCard
+            key={artist._id}
+            rank={artist.rank}
+            artistName={artist.artistName}
+            genres={artist.genres}
+            imageUrl={artist.imageUrl}
+            externalUrl={artist.externalUrl}
+            rankChange={getRankChange(artist.rank, previousRank)}
+          />
+        );
+      })}
     </div>
   );
 }
