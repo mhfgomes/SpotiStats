@@ -49,6 +49,38 @@ export default defineSchema({
     .index("by_user_range", ["spotifyUserId", "timeRange"])
     .index("by_user_range_rank", ["spotifyUserId", "timeRange", "rank"]),
 
+  topTrackHistory: defineTable({
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+    syncedAt: v.number(),
+    rank: v.number(),
+    trackSpotifyId: v.string(),
+    trackName: v.string(),
+    albumName: v.string(),
+    albumImageUrl: v.optional(v.string()),
+    artistNames: v.array(v.string()),
+  }).index("by_user_range_syncedAt", ["spotifyUserId", "timeRange", "syncedAt"]),
+
+  topArtistHistory: defineTable({
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+    syncedAt: v.number(),
+    rank: v.number(),
+    artistSpotifyId: v.string(),
+    artistName: v.string(),
+    imageUrl: v.optional(v.string()),
+    genres: v.array(v.string()),
+  }).index("by_user_range_syncedAt", ["spotifyUserId", "timeRange", "syncedAt"]),
+
+  topGenreHistory: defineTable({
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+    syncedAt: v.number(),
+    rank: v.number(),
+    genre: v.string(),
+    count: v.number(),
+  }).index("by_user_range_syncedAt", ["spotifyUserId", "timeRange", "syncedAt"]),
+
   playHistory: defineTable({
     spotifyUserId: v.id("spotifyUsers"),
     trackSpotifyId: v.string(),

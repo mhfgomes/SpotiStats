@@ -12,7 +12,7 @@ export default function TopGenresPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-spotify-subtext text-sm">
-            Genre distribution from your top artists
+            Genre distribution with movement from the previous sync
           </p>
         </div>
         <TimeRangeTabs value={timeRange} onChange={setTimeRange} />

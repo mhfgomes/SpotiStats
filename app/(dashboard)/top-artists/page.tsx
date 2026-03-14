@@ -12,7 +12,7 @@ export default function TopArtistsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-spotify-subtext text-sm">
-            Your most listened-to artists
+            Your most listened-to artists with movement from the previous sync
           </p>
         </div>
         <TimeRangeTabs value={timeRange} onChange={setTimeRange} />
@@ -20,7 +20,10 @@ export default function TopArtistsPage() {
 
       <div className="spotify-card">
         <div className="flex items-center gap-4 px-3 py-2 border-b border-white/5 text-xs text-spotify-subtext uppercase tracking-wider">
-          <span className="w-6 text-right">#</span>
+          <span className="w-12 shrink-0 flex items-center gap-2">
+            <span className="w-4" />
+            <span className="w-6 text-right">#</span>
+          </span>
           <span className="w-12 shrink-0" />
           <span className="flex-1">Artist</span>
           <span className="flex-1">Genres</span>
