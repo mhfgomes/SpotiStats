@@ -1,7 +1,6 @@
 import {
   internalQuery,
   internalMutation,
-  mutation,
   query,
   action,
 } from "./_generated/server";
@@ -142,31 +141,5 @@ export const getSpotifyUserById = internalQuery({
   args: { id: v.id("spotifyUsers") },
   handler: async (ctx, { id }) => {
     return ctx.db.get(id);
-  },
-});
-
-/** UI "Sync Now" button */
-export const triggerManualSync = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    const user = await ctx.db
-      .query("spotifyUsers")
-      .withIndex("by_betterAuthUserId", (q) =>
-        q.eq("betterAuthUserId", identity.subject)
-      )
-      .unique();
-
-    if (!user) throw new Error("Spotify user not found");
-    if (user.syncInProgress) return { alreadySyncing: true };
-
-    await ctx.scheduler.runAfter(0, internal.spotify.sync.fullSync, {
-      betterAuthUserId: identity.subject,
-      spotifyUserId: user._id,
-    });
-
-    return { triggered: true };
   },
 });

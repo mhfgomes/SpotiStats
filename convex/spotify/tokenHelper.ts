@@ -2,7 +2,6 @@
 
 import type { ActionCtx } from "../_generated/server";
 import { components } from "../_generated/api";
-import { createAuth } from "../auth";
 
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 
