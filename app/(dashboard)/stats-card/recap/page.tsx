@@ -16,7 +16,7 @@ export default function RecapCardPage() {
     <div className="max-w-5xl mx-auto">
       <div className="mb-6">
         <p className="text-spotify-subtext text-sm">
-          Your all-time Spotify stats in a downloadable 400 × 600 card
+          Your Spotify stats from the last 4 weeks in a downloadable 400 × 600 card
         </p>
       </div>
 

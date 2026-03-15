@@ -34,7 +34,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   const user = useQuery(api.users.getSpotifyUser);
 
   const [theme, setTheme] = useState<CardThemeKey>("ocean");
-  const [range, setRange] = useState<RangeId>("long_term");
+  const [range, setRange] = useState<RangeId>("short_term");
   const [previewKey, setPreviewKey] = useState(0);
   const [copied, setCopied] = useState<"url" | "html" | "md" | null>(null);
 

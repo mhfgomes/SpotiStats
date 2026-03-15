@@ -5,7 +5,7 @@ import { TimeRangeTabs } from "@/components/stats/TimeRangeTabs";
 import { TopArtistsList } from "@/components/stats/TopArtistsList";
 
 export default function TopArtistsPage() {
-  const { timeRange, setTimeRange } = useTimeRange("medium_term");
+  const { timeRange, setTimeRange } = useTimeRange();
 
   return (
     <div className="max-w-4xl mx-auto">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { TimeRange } from "@/types/spotify";
 
-export function useTimeRange(initial: TimeRange = "medium_term") {
+export function useTimeRange(initial: TimeRange = "short_term") {
   const [timeRange, setTimeRange] = useState<TimeRange>(initial);
   return { timeRange, setTimeRange };
 }
