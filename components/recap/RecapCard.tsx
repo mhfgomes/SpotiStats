@@ -14,9 +14,9 @@ interface RecapCardProps {
 }
 
 export function RecapCard({ cardRef, themeKey = "ocean" }: RecapCardProps) {
-  const topTracks = useQuery(api.tracks.getTopTracks, { timeRange: "long_term" });
-  const topArtists = useQuery(api.artists.getTopArtists, { timeRange: "long_term" });
-  const topGenres = useQuery(api.artists.getTopGenres, { timeRange: "long_term" });
+  const topTracks = useQuery(api.tracks.getTopTracks, { timeRange: "short_term" });
+  const topArtists = useQuery(api.artists.getTopArtists, { timeRange: "short_term" });
+  const topGenres = useQuery(api.artists.getTopGenres, { timeRange: "short_term" });
   const user = useQuery(api.users.getSpotifyUser);
 
   const theme = CARD_THEMES[themeKey];

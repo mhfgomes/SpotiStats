@@ -5,7 +5,7 @@ import { TimeRangeTabs } from "@/components/stats/TimeRangeTabs";
 import { GenreBreakdown } from "@/components/stats/GenreBreakdown";
 
 export default function TopGenresPage() {
-  const { timeRange, setTimeRange } = useTimeRange("medium_term");
+  const { timeRange, setTimeRange } = useTimeRange();
 
   return (
     <div className="max-w-4xl mx-auto">

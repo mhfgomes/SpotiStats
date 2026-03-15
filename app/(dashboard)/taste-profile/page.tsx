@@ -21,7 +21,7 @@ export default function TasteProfilePage() {
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
         <p className="text-spotify-subtext text-sm">
-          Based on your top artists&apos; genres over the past 6 months
+          Based on your top artists&apos; genres over the past 4 weeks
         </p>
       </div>
 

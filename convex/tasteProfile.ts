@@ -50,7 +50,7 @@ export const computeTasteProfile = query({
     const artists = await ctx.db
       .query("topArtists")
       .withIndex("by_user_range_rank", (q) =>
-        q.eq("spotifyUserId", spotifyUser._id).eq("timeRange", "medium_term")
+        q.eq("spotifyUserId", spotifyUser._id).eq("timeRange", "short_term")
       )
       .order("asc")
       .take(20);

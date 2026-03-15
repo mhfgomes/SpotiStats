@@ -391,11 +391,11 @@ export async function GET(
 
   const type     = searchParams.get("type")  ?? "classic";
   const themeKey = (searchParams.get("theme") ?? "ocean") as ThemeKey;
-  const range    = searchParams.get("range") ?? "long_term";
+  const range    = searchParams.get("range") ?? "short_term";
 
   const theme        = CARD_THEMES[themeKey] ?? CARD_THEMES.ocean;
   const { width, height } = DIMENSIONS[type] ?? DIMENSIONS.classic;
-  const rangeLabel   = RANGE_LABELS[range] ?? "All time";
+  const rangeLabel   = RANGE_LABELS[range] ?? "Last 4 weeks";
   const spotifyUserId = userId as Id<"spotifyUsers">;
 
   const [tracks, artists, genres, user] = await Promise.all([

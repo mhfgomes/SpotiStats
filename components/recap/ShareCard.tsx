@@ -37,7 +37,7 @@ export function ShareCard({ themeKey = "ocean" }: ShareCardProps) {
       <div className="spotify-card p-5">
         <p className="text-sm font-semibold mb-0.5">Shareable Stats Card</p>
         <p className="text-xs text-spotify-subtext mb-4">
-          A live-generated image of your all-time Spotify stats. Works in
+          A live-generated image of your Spotify stats from the last 4 weeks. Works in
           Discord, Twitter, GitHub READMEs, and anywhere that renders images.
         </p>
 
