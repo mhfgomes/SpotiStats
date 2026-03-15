@@ -67,10 +67,12 @@ export async function getTopArtists(
 export async function getRecentlyPlayed(
   accessToken: string,
   limit = 50,
-  after?: string
+  after?: string,
+  before?: string
 ): Promise<SpotifyRecentlyPlayedResponse> {
   const params: Record<string, string> = { limit: String(limit) };
   if (after) params.after = after;
+  if (before) params.before = before;
   return spotifyFetch<SpotifyRecentlyPlayedResponse>(
     accessToken,
     "/me/player/recently-played",
