@@ -90,18 +90,17 @@ Open http://127.0.0.1:3000 (not localhost!)
 1. Click "Continue with Spotify"
 2. Authorize the app
 3. You'll be redirected to the dashboard
-4. The initial sync will start automatically (takes ~30 seconds)
-5. Once synced, all pages will populate with your data
+4. Your dashboard will fetch data live from Spotify on load
+5. Snapshot history will start saving automatically as you browse
 
 ## Verification Checklist
 
 - [ ] Sign in with Spotify → session established
 - [ ] `spotifyUsers` row appears in Convex dashboard
-- [ ] `topTracks` and `topArtists` tables populate
+- [ ] `topTrackHistory`, `topArtistHistory`, and `topGenreHistory` snapshots appear after browsing
 - [ ] `/top-tracks` shows 50 tracks with album art
 - [ ] `/taste-profile` shows the radar chart
 - [ ] `/recap` generates a downloadable PNG
-- [ ] Cron jobs visible in Convex scheduler
 
 ## Production Deployment
 

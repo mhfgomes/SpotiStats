@@ -12,7 +12,7 @@ export default function TopTracksPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-spotify-subtext text-sm">
-            Your most listened-to tracks with movement from the previous sync
+            Your most listened-to tracks, fetched live from Spotify
           </p>
         </div>
         <TimeRangeTabs value={timeRange} onChange={setTimeRange} />

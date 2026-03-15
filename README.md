@@ -10,12 +10,12 @@ A personal Spotify analytics dashboard built with Next.js, Convex, and Better Au
 - **Taste Profile** — Interactive radar chart showing your music preferences
 - **Shareable Stats Card** — Generate downloadable PNG cards with your all-time stats
 - **Live Banner API** — Dynamic image URL for GitHub READMEs, Discord bios, etc.
-- **Auto-Sync** — Background sync for top tracks and artists via Convex cron jobs
+- **Snapshot History** — Persist periodic history snapshots for rank movement without caching live stats
 
 ## Tech Stack
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS, Recharts
-- **Backend**: Convex (database, functions, cron jobs)
+- **Backend**: Convex (auth integration, snapshot storage, server functions)
 - **Auth**: Better Auth with Spotify OAuth
 - **API**: Spotify Web API
 
@@ -45,17 +45,17 @@ components/
 
 convex/
 ├── auth.ts               # Better Auth integration
-├── crons.ts              # Scheduled top tracks/artists sync
 ├── schema.ts             # Database schema
-├── spotify/              # Spotify API sync functions
+├── spotify/              # Spotify token helpers
 └── *.ts                  # Queries and mutations
 ```
 
 ## Database Schema
 
 - **spotifyUsers** — User profiles linked to Better Auth
-- **topTracks** — Top 50 tracks per user per time range
-- **topArtists** — Top 50 artists per user per time range
+- **topTrackHistory** — Saved historical top-track snapshots
+- **topArtistHistory** — Saved historical top-artist snapshots
+- **topGenreHistory** — Saved historical top-genre snapshots
 
 ## Getting Started
 

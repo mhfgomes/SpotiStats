@@ -1,24 +1,20 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { TrackCard } from "./TrackCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TimeRange } from "@/types/spotify";
 import { getRankChange } from "./RankChangeBadge";
+import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
 
 interface TopTracksListProps {
   timeRange: TimeRange;
 }
 
 export function TopTracksList({ timeRange }: TopTracksListProps) {
-  const tracks = useQuery(api.tracks.getTopTracks, { timeRange });
-  const history = useQuery(api.topHistory.getTopTracksHistory, {
-    timeRange,
-    limit: 2,
-  });
+  const { data, error, isLoading } = useSpotifyTopData(timeRange);
+  const tracks = data?.tracks ?? [];
 
-  if (tracks === undefined) {
+  if (isLoading) {
     return (
       <div className="space-y-1">
         {Array.from({ length: 10 }).map((_, i) => (
@@ -44,31 +40,34 @@ export function TopTracksList({ timeRange }: TopTracksListProps) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-spotify-subtext text-sm">Could not load top tracks.</p>
+        <p className="text-spotify-subtext text-xs mt-1">{error}</p>
+      </div>
+    );
+  }
+
   if (tracks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <p className="text-spotify-subtext text-sm">No tracks found.</p>
-        <p className="text-spotify-subtext text-xs mt-1">
-          Your stats will appear after the next automatic sync.
-        </p>
+        <p className="text-spotify-subtext text-xs mt-1">Spotify did not return any top tracks for this range.</p>
       </div>
     );
   }
 
   return (
     <div className="divide-y divide-white/5">
-      {(tracks as NonNullable<typeof tracks>).map((track) => {
-        const previousSnapshot = history?.[1];
-        const previousRank =
-          previousSnapshot === undefined
-            ? undefined
-            : previousSnapshot.items.find(
-                (item) => item.trackSpotifyId === track.trackSpotifyId
-              )?.rank ?? null;
+      {tracks.map((track) => {
+        const previousRank = data?.hasComparisonSnapshot
+          ? data.previousTrackRanks[track.trackSpotifyId] ?? null
+          : undefined;
 
         return (
           <TrackCard
-            key={track._id}
+            key={track.trackSpotifyId}
             rank={track.rank}
             trackName={track.trackName}
             albumName={track.albumName}

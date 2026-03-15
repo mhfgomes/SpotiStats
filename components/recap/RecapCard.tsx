@@ -1,12 +1,13 @@
 "use client";
 
 import type React from "react";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import Image from "next/image";
 import { Music2 } from "lucide-react";
 import { CARD_THEMES } from "@/lib/themes";
 import type { CardThemeKey } from "@/lib/themes";
+import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface RecapCardProps {
   cardRef: React.RefObject<HTMLDivElement | null>;
@@ -14,22 +15,16 @@ interface RecapCardProps {
 }
 
 export function RecapCard({ cardRef, themeKey = "ocean" }: RecapCardProps) {
-  const topTracks = useQuery(api.tracks.getTopTracks, { timeRange: "short_term" });
-  const topArtists = useQuery(api.artists.getTopArtists, { timeRange: "short_term" });
-  const topGenres = useQuery(api.artists.getTopGenres, { timeRange: "short_term" });
+  const { data, isLoading: isTopDataLoading } = useSpotifyTopData("short_term");
   const user = useQuery(api.users.getSpotifyUser);
 
   const theme = CARD_THEMES[themeKey];
 
-  const isLoading =
-    topTracks === undefined ||
-    topArtists === undefined ||
-    topGenres === undefined ||
-    user === undefined;
+  const isLoading = isTopDataLoading || user === undefined;
 
-  const top5Tracks = topTracks?.slice(0, 5) ?? [];
-  const topArtist = topArtists?.[0];
-  const topGenre = topGenres?.[0]?.genre ?? "—";
+  const top5Tracks = data?.tracks.slice(0, 5) ?? [];
+  const topArtist = data?.artists[0];
+  const topGenre = data?.genres[0]?.genre ?? "—";
   const year = new Date().getFullYear();
 
   const cardBase: React.CSSProperties = {
@@ -225,7 +220,7 @@ export function RecapCard({ cardRef, themeKey = "ocean" }: RecapCardProps) {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {top5Tracks.map((track: typeof top5Tracks[number], i: number) => (
-            <div key={track._id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div key={track.trackSpotifyId} style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span
                 style={{
                   fontSize: 12,
