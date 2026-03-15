@@ -1,9 +1,8 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { TasteRadar } from "@/components/stats/TasteRadar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
 
 const AXIS_META: Record<string, { desc: string }> = {
   Energy:       { desc: "Electronic, dance, hip-hop, metal — high-tempo and high-intensity music" },
@@ -15,7 +14,8 @@ const AXIS_META: Record<string, { desc: string }> = {
 };
 
 export default function TasteProfilePage() {
-  const profile = useQuery(api.tasteProfile.computeTasteProfile);
+  const { data, error, isLoading } = useSpotifyTopData("short_term");
+  const profile = data?.tasteProfile ?? [];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -25,15 +25,20 @@ export default function TasteProfilePage() {
         </p>
       </div>
 
-      {profile === undefined ? (
+      {isLoading ? (
         <div className="spotify-card p-6 flex gap-8">
           <Skeleton className="h-80 w-full rounded-xl" />
         </div>
-      ) : !profile || profile.length === 0 ? (
+      ) : error ? (
+        <div className="spotify-card p-6 flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-spotify-subtext text-sm">Could not load taste profile.</p>
+          <p className="text-spotify-subtext text-xs mt-1">{error}</p>
+        </div>
+      ) : profile.length === 0 ? (
         <div className="spotify-card p-6 flex flex-col items-center justify-center py-16 text-center">
           <p className="text-spotify-subtext text-sm">No taste profile data yet.</p>
           <p className="text-spotify-subtext text-xs mt-1">
-            Your taste profile will appear after the next automatic sync.
+            Spotify did not return enough artist genre data yet.
           </p>
         </div>
       ) : (

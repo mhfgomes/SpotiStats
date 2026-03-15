@@ -1,7 +1,5 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import {
   BarChart,
   Bar,
@@ -14,6 +12,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TimeRange } from "@/types/spotify";
 import { getRankChange, RankChangeBadge } from "./RankChangeBadge";
+import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
 
 interface GenreBreakdownProps {
   timeRange: TimeRange;
@@ -40,13 +39,10 @@ const CustomTooltip = ({
 };
 
 export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
-  const genres = useQuery(api.artists.getTopGenres, { timeRange });
-  const history = useQuery(api.topHistory.getTopGenresHistory, {
-    timeRange,
-    limit: 2,
-  });
+  const { data, error, isLoading } = useSpotifyTopData(timeRange);
+  const genres = data?.genres ?? [];
 
-  if (genres === undefined) {
+  if (isLoading) {
     const barWidths = ["85%", "72%", "65%", "58%", "50%", "44%", "38%", "32%", "26%", "20%"];
     return (
       <div className="space-y-5 py-2">
@@ -60,6 +56,15 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-spotify-subtext text-sm">Could not load genre data.</p>
+        <p className="text-spotify-subtext text-xs mt-1">{error}</p>
+      </div>
+    );
+  }
+
   if (genres.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -69,7 +74,6 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
   }
 
   const top15 = genres.slice(0, 15);
-  const previousSnapshot = history?.[1];
 
   return (
     <div className="space-y-6">
@@ -113,18 +117,15 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
         <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
           <p className="text-sm font-medium">Relative Position</p>
           <p className="text-xs text-spotify-subtext">
-            Compared with the previous sync
+            Compared with the previous saved snapshot
           </p>
         </div>
 
         <div className="divide-y divide-white/5">
           {top15.slice(0, 10).map((genre, index) => {
-            const previousRank =
-              previousSnapshot === undefined
-                ? undefined
-                : previousSnapshot.items.find(
-                    (item) => item.genre === genre.genre
-                  )?.rank ?? null;
+            const previousRank = data?.hasComparisonSnapshot
+              ? data.previousGenreRanks[genre.genre] ?? null
+              : undefined;
 
             return (
               <div

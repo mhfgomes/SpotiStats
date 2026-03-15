@@ -1,5 +1,5 @@
 import type { QueryCtx } from "./_generated/server";
-import { internalMutation, query } from "./_generated/server";
+import { internalMutation, internalQuery, query } from "./_generated/server";
 import { v } from "convex/values";
 
 const trackHistoryItemValidator = v.object({
@@ -180,6 +180,43 @@ export const getTopTracksHistory = query({
   },
 });
 
+export const getTopTracksHistoryByUser = internalQuery({
+  args: {
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { spotifyUserId, timeRange, limit = 6 }) => {
+    const docs = await ctx.db
+      .query("topTrackHistory")
+      .withIndex("by_user_range_syncedAt", (q) =>
+        q.eq("spotifyUserId", spotifyUserId).eq("timeRange", timeRange)
+      )
+      .order("desc")
+      .take(limit * 60);
+
+    return groupSnapshots(docs, limit);
+  },
+});
+
+export const getLatestTopTracksSnapshotTimestamp = internalQuery({
+  args: {
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+  },
+  handler: async (ctx, { spotifyUserId, timeRange }) => {
+    const latest = await ctx.db
+      .query("topTrackHistory")
+      .withIndex("by_user_range_syncedAt", (q) =>
+        q.eq("spotifyUserId", spotifyUserId).eq("timeRange", timeRange)
+      )
+      .order("desc")
+      .first();
+
+    return latest?.syncedAt ?? null;
+  },
+});
+
 export const getTopArtistsHistory = query({
   args: {
     timeRange: v.string(),
@@ -201,6 +238,25 @@ export const getTopArtistsHistory = query({
   },
 });
 
+export const getTopArtistsHistoryByUser = internalQuery({
+  args: {
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { spotifyUserId, timeRange, limit = 6 }) => {
+    const docs = await ctx.db
+      .query("topArtistHistory")
+      .withIndex("by_user_range_syncedAt", (q) =>
+        q.eq("spotifyUserId", spotifyUserId).eq("timeRange", timeRange)
+      )
+      .order("desc")
+      .take(limit * 60);
+
+    return groupSnapshots(docs, limit);
+  },
+});
+
 export const getTopGenresHistory = query({
   args: {
     timeRange: v.string(),
@@ -214,6 +270,25 @@ export const getTopGenresHistory = query({
       .query("topGenreHistory")
       .withIndex("by_user_range_syncedAt", (q) =>
         q.eq("spotifyUserId", spotifyUser._id).eq("timeRange", timeRange)
+      )
+      .order("desc")
+      .take(limit * 30);
+
+    return groupSnapshots(docs, limit);
+  },
+});
+
+export const getTopGenresHistoryByUser = internalQuery({
+  args: {
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { spotifyUserId, timeRange, limit = 6 }) => {
+    const docs = await ctx.db
+      .query("topGenreHistory")
+      .withIndex("by_user_range_syncedAt", (q) =>
+        q.eq("spotifyUserId", spotifyUserId).eq("timeRange", timeRange)
       )
       .order("desc")
       .take(limit * 30);

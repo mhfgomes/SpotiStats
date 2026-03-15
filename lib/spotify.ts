@@ -20,6 +20,7 @@ async function spotifyFetch<T>(
   }
 
   const res = await fetch(url.toString(), {
+    cache: "no-store",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",

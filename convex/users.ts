@@ -1,8 +1,8 @@
 import {
   internalQuery,
   internalMutation,
-  query,
   action,
+  query,
 } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
@@ -38,29 +38,7 @@ export const ensureSpotifyUser = internalMutation({
       spotifyId: args.spotifyId,
       displayName: args.displayName,
       avatarUrl: args.avatarUrl,
-      syncInProgress: false,
     });
-  },
-});
-
-export const setSyncInProgress = internalMutation({
-  args: { spotifyUserId: v.id("spotifyUsers"), inProgress: v.boolean() },
-  handler: async (ctx, { spotifyUserId, inProgress }) => {
-    await ctx.db.patch(spotifyUserId, { syncInProgress: inProgress });
-  },
-});
-
-export const updateLastSynced = internalMutation({
-  args: { spotifyUserId: v.id("spotifyUsers") },
-  handler: async (ctx, { spotifyUserId }) => {
-    await ctx.db.patch(spotifyUserId, { lastSyncedAt: Date.now() });
-  },
-});
-
-export const getAllSpotifyUsers = internalQuery({
-  args: {},
-  handler: async (ctx) => {
-    return ctx.db.query("spotifyUsers").collect();
   },
 });
 
@@ -92,8 +70,7 @@ export const getSpotifyUser = query({
 
 /**
  * Called from the frontend after Spotify OAuth login succeeds.
- * Fetches the Spotify profile, creates the spotifyUsers row, then triggers
- * a full sync if the user is new.
+ * Fetches the Spotify profile and ensures the spotifyUsers row exists.
  */
 export const initUserSync = action({
   args: {},
@@ -121,18 +98,6 @@ export const initUserSync = action({
       }
     );
 
-    // Check if this user has never synced
-    const user = await ctx.runQuery(internal.users.getSpotifyUserById, {
-      id: spotifyUserId,
-    });
-
-    if (!user?.lastSyncedAt && !user?.syncInProgress) {
-      await ctx.runAction(internal.spotify.sync.fullSync, {
-        betterAuthUserId,
-        spotifyUserId,
-      });
-    }
-
     return { spotifyUserId };
   },
 });
@@ -141,5 +106,17 @@ export const getSpotifyUserById = internalQuery({
   args: { id: v.id("spotifyUsers") },
   handler: async (ctx, { id }) => {
     return ctx.db.get(id);
+  },
+});
+
+export const getSpotifyUserByBetterAuthUserId = internalQuery({
+  args: { betterAuthUserId: v.string() },
+  handler: async (ctx, { betterAuthUserId }) => {
+    return ctx.db
+      .query("spotifyUsers")
+      .withIndex("by_betterAuthUserId", (q) =>
+        q.eq("betterAuthUserId", betterAuthUserId)
+      )
+      .unique();
   },
 });

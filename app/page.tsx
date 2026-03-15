@@ -107,7 +107,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 { n: "1", icon: SpotifyLogo, title: "Connect",  desc: "Sign in with Spotify. We only request read-only access to your listening data." },
-                { n: "2", icon: Headphones,  title: "Sync",     desc: "We pull your top tracks, artists, and play history directly from the Spotify API." },
+                { n: "2", icon: Headphones,  title: "Fetch Live", desc: "We request your current Spotify top tracks, artists, and play history directly from the Spotify API." },
                 { n: "3", icon: BarChart2,   title: "Explore",  desc: "Browse your personalized dashboard, switch time ranges, and download your recap card." },
               ].map(({ n, icon: Icon, title, desc }) => (
                 <div key={n} className="flex flex-col items-center">

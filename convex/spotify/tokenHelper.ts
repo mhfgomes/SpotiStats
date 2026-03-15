@@ -5,6 +5,15 @@ import { components } from "../_generated/api";
 
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 
+function toBase64(value: string) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
+}
+
 /**
  * Gets a valid Spotify access token for a user identified by their Better Auth user ID.
  * Automatically refreshes expired tokens by calling Spotify's token endpoint.
@@ -53,7 +62,7 @@ export async function getSpotifyToken(
 
   const clientId = process.env.SPOTIFY_CLIENT_ID!;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
-  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+  const basic = toBase64(`${clientId}:${clientSecret}`);
 
   const res = await fetch(SPOTIFY_TOKEN_URL, {
     method: "POST",

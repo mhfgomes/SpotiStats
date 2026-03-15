@@ -8,20 +8,12 @@
  * @module
  */
 
-import type * as artists from "../artists.js";
 import type * as auth from "../auth.js";
-import type * as crons from "../crons.js";
-import type * as history from "../history.js";
 import type * as http from "../http.js";
 import type * as nowPlaying from "../nowPlaying.js";
-import type * as spotify_fetchRecentlyPlayed from "../spotify/fetchRecentlyPlayed.js";
-import type * as spotify_fetchTopItems from "../spotify/fetchTopItems.js";
-import type * as spotify_sync from "../spotify/sync.js";
 import type * as spotify_tokenHelper from "../spotify/tokenHelper.js";
-import type * as syncStatus from "../syncStatus.js";
-import type * as tasteProfile from "../tasteProfile.js";
+import type * as spotifyLive from "../spotifyLive.js";
 import type * as topHistory from "../topHistory.js";
-import type * as tracks from "../tracks.js";
 import type * as users from "../users.js";
 
 import type {
@@ -31,20 +23,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  artists: typeof artists;
   auth: typeof auth;
-  crons: typeof crons;
-  history: typeof history;
   http: typeof http;
   nowPlaying: typeof nowPlaying;
-  "spotify/fetchRecentlyPlayed": typeof spotify_fetchRecentlyPlayed;
-  "spotify/fetchTopItems": typeof spotify_fetchTopItems;
-  "spotify/sync": typeof spotify_sync;
   "spotify/tokenHelper": typeof spotify_tokenHelper;
-  syncStatus: typeof syncStatus;
-  tasteProfile: typeof tasteProfile;
+  spotifyLive: typeof spotifyLive;
   topHistory: typeof topHistory;
-  tracks: typeof tracks;
   users: typeof users;
 }>;
 

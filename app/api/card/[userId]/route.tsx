@@ -3,6 +3,7 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { CARD_THEMES } from "@/lib/themes";
 import type { CardTheme, CardThemeKey } from "@/lib/themes";
+import type { LiveTopArtist, LiveTopGenre, LiveTopTrack } from "@/lib/spotify-live";
 
 export const runtime = "nodejs";
 
@@ -14,10 +15,13 @@ const trunc = (s: string, max: number) =>
 type Theme = CardTheme;
 type ThemeKey = CardThemeKey;
 
-type Track = Awaited<ReturnType<typeof client.query<typeof api.tracks.getTopTracksPublic>>>[number];
-type Artist = Awaited<ReturnType<typeof client.query<typeof api.artists.getTopArtistsPublic>>>[number];
-type Genre = { genre: string; count: number };
-type User = NonNullable<Awaited<ReturnType<typeof client.query<typeof api.users.getSpotifyUserPublic>>>>;
+type Track = LiveTopTrack;
+type Artist = LiveTopArtist;
+type Genre = LiveTopGenre;
+type User = {
+  displayName: string;
+  avatarUrl?: string;
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -380,6 +384,8 @@ const DIMENSIONS: Record<string, { width: number; height: number }> = {
   compact: { width: 600,  height: 600  },
 };
 
+const VALID_RANGES = new Set(["short_term", "medium_term", "long_term"]);
+
 export async function GET(
   req: Request,
   context: { params: Promise<{ userId: string }> },
@@ -391,23 +397,26 @@ export async function GET(
 
   const type     = searchParams.get("type")  ?? "classic";
   const themeKey = (searchParams.get("theme") ?? "ocean") as ThemeKey;
-  const range    = searchParams.get("range") ?? "short_term";
+  const requestedRange = searchParams.get("range") ?? "short_term";
+  const range = VALID_RANGES.has(requestedRange)
+    ? (requestedRange as "short_term" | "medium_term" | "long_term")
+    : "short_term";
 
   const theme        = CARD_THEMES[themeKey] ?? CARD_THEMES.ocean;
   const { width, height } = DIMENSIONS[type] ?? DIMENSIONS.classic;
   const rangeLabel   = RANGE_LABELS[range] ?? "Last 4 weeks";
   const spotifyUserId = userId as Id<"spotifyUsers">;
 
-  const [tracks, artists, genres, user] = await Promise.all([
-    client.query(api.tracks.getTopTracksPublic,  { spotifyUserId, timeRange: range }),
-    client.query(api.artists.getTopArtistsPublic, { spotifyUserId, timeRange: range }),
-    client.query(api.artists.getTopGenresPublic,  { spotifyUserId, timeRange: range }),
-    client.query(api.users.getSpotifyUserPublic,  { spotifyUserId }),
-  ]);
+  const cardData = await client.action(api.spotifyLive.getPublicCardData, {
+    spotifyUserId,
+    timeRange: range,
+  });
 
-  if (!user) {
+  if (!cardData?.user) {
     return new Response("User not found", { status: 404 });
   }
+
+  const { tracks, artists, genres, user } = cardData;
 
   let svg: string;
   switch (type) {
@@ -427,7 +436,7 @@ export async function GET(
   return new Response(svg, {
     headers: {
       "Content-Type": "image/svg+xml",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "public, max-age=300",
     },
   });
 }

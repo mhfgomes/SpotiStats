@@ -12,7 +12,7 @@ export default function TopGenresPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-spotify-subtext text-sm">
-            Genre distribution with movement from the previous sync
+            Genre distribution built from your live Spotify top artists
           </p>
         </div>
         <TimeRangeTabs value={timeRange} onChange={setTimeRange} />
