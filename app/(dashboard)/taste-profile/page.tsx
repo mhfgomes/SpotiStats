@@ -33,7 +33,7 @@ export default function TasteProfilePage() {
         <div className="spotify-card p-6 flex flex-col items-center justify-center py-16 text-center">
           <p className="text-spotify-subtext text-sm">No taste profile data yet.</p>
           <p className="text-spotify-subtext text-xs mt-1">
-            Sync your top artists to generate your taste profile.
+            Your taste profile will appear after the next automatic sync.
           </p>
         </div>
       ) : (

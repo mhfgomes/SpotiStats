@@ -43,7 +43,7 @@ export function TopArtistsList({ timeRange }: TopArtistsListProps) {
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <p className="text-spotify-subtext text-sm">No artists found.</p>
         <p className="text-spotify-subtext text-xs mt-1">
-          Try syncing your data first.
+          Your stats will appear after the next automatic sync.
         </p>
       </div>
     );

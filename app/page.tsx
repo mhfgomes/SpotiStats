@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "@/lib/auth-client";
-import { Music2, BarChart2, Users, Disc3, Clock, Download, Headphones, Layers, Radio, TrendingUp } from "lucide-react";
+import { Music2, BarChart2, Users, Clock, Download, Headphones, Layers, Radio } from "lucide-react";
 
 const SpotifyLogo = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -82,7 +82,7 @@ export default function HomePage() {
         {/* FEATURES */}
         <section className="border-t border-white/6 py-20 px-6 md:px-10">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-xs font-semibold text-white/35 uppercase tracking-widest mb-10 text-center">What's inside</h2>
+            <h2 className="text-xs font-semibold text-white/35 uppercase tracking-widest mb-10 text-center">What&apos;s inside</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {features.map((f) => {
                 const Icon = f.icon;
@@ -132,7 +132,7 @@ export default function HomePage() {
             className="inline-flex items-center gap-3 bg-[#1DB954] hover:bg-[#1ed760] active:scale-[.98] text-black font-bold py-3.5 px-8 rounded-full transition-all duration-150 text-sm"
           >
             <SpotifyLogo />
-            Get Started — It's Free
+            Get Started - It&apos;s Free
           </button>
         </section>
 
