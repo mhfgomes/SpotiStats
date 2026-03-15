@@ -1,3 +1,5 @@
+"use client";
+
 import { RecentlyPlayed } from "@/components/stats/RecentlyPlayed";
 
 export default function HistoryPage() {
@@ -5,7 +7,7 @@ export default function HistoryPage() {
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
         <p className="text-spotify-subtext text-sm">
-          Your recently played tracks, synced every 30 minutes
+          Your recently played tracks, fetched live from Spotify
         </p>
       </div>
 

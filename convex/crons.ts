@@ -3,7 +3,7 @@ import { internal } from "./_generated/api";
 
 const crons = cronJobs();
 
-// Full sync (top tracks + artists + recently played) every 24 hours
+// Full sync (top tracks + artists) every 24 hours
 crons.interval(
   "full-sync-all-users",
   { hours: 24 },

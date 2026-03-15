@@ -97,7 +97,7 @@ Open http://127.0.0.1:3000 (not localhost!)
 
 - [ ] Sign in with Spotify → session established
 - [ ] `spotifyUsers` row appears in Convex dashboard
-- [ ] `topTracks`, `topArtists`, `playHistory` tables populate
+- [ ] `topTracks` and `topArtists` tables populate
 - [ ] `/top-tracks` shows 50 tracks with album art
 - [ ] `/taste-profile` shows the radar chart
 - [ ] `/recap` generates a downloadable PNG
