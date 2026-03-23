@@ -2,6 +2,8 @@ import type { QueryCtx } from "./_generated/server";
 import { internalMutation, internalQuery, query } from "./_generated/server";
 import { v } from "convex/values";
 
+const SNAPSHOT_INTERVAL_MS = 12 * 60 * 60 * 1000;
+
 const trackHistoryItemValidator = v.object({
   rank: v.number(),
   trackSpotifyId: v.string(),
@@ -24,6 +26,41 @@ const genreHistoryItemValidator = v.object({
   genre: v.string(),
   count: v.number(),
 });
+
+function isSameUtcDay(timestampA: number, timestampB: number) {
+  const dateA = new Date(timestampA);
+  const dateB = new Date(timestampB);
+
+  return (
+    dateA.getUTCFullYear() === dateB.getUTCFullYear() &&
+    dateA.getUTCMonth() === dateB.getUTCMonth() &&
+    dateA.getUTCDate() === dateB.getUTCDate()
+  );
+}
+
+async function shouldSkipSnapshotSave(
+  ctx: { db: QueryCtx["db"] },
+  spotifyUserId: string,
+  timeRange: string,
+  now: number
+) {
+  const latest = await ctx.db
+    .query("topTrackHistory")
+    .withIndex("by_user_range_syncedAt", (q) =>
+      q.eq("spotifyUserId", spotifyUserId as never).eq("timeRange", timeRange)
+    )
+    .order("desc")
+    .first();
+
+  if (!latest) {
+    return false;
+  }
+
+  return (
+    now - latest.syncedAt < SNAPSHOT_INTERVAL_MS ||
+    isSameUtcDay(latest.syncedAt, now)
+  );
+}
 
 async function getCurrentSpotifyUser(ctx: QueryCtx) {
   const identity = await ctx.auth.getUserIdentity();
@@ -156,6 +193,59 @@ export const saveTopGenresSnapshot = internalMutation({
         })
       )
     );
+  },
+});
+
+export const saveSnapshotBundleIfNeeded = internalMutation({
+  args: {
+    spotifyUserId: v.id("spotifyUsers"),
+    timeRange: v.string(),
+    tracks: v.array(trackHistoryItemValidator),
+    artists: v.array(artistHistoryItemValidator),
+    genres: v.array(genreHistoryItemValidator),
+  },
+  handler: async (ctx, { spotifyUserId, timeRange, tracks, artists, genres }) => {
+    const syncedAt = Date.now();
+
+    if (
+      await shouldSkipSnapshotSave(
+        ctx,
+        spotifyUserId,
+        timeRange,
+        syncedAt
+      )
+    ) {
+      return null;
+    }
+
+    await Promise.all([
+      ...tracks.map((item) =>
+        ctx.db.insert("topTrackHistory", {
+          spotifyUserId,
+          timeRange,
+          syncedAt,
+          ...item,
+        })
+      ),
+      ...artists.map((item) =>
+        ctx.db.insert("topArtistHistory", {
+          spotifyUserId,
+          timeRange,
+          syncedAt,
+          ...item,
+        })
+      ),
+      ...genres.map((item) =>
+        ctx.db.insert("topGenreHistory", {
+          spotifyUserId,
+          timeRange,
+          syncedAt,
+          ...item,
+        })
+      ),
+    ]);
+
+    return syncedAt;
   },
 });
 

@@ -39,12 +39,6 @@ export function useSpotifyTopData(timeRange: TimeRange): SpotifyTopDataState {
   useEffect(() => {
     let cancelled = false;
 
-    setState((current) => ({
-      data: current.data,
-      error: null,
-      isLoading: true,
-    }));
-
     getTopData({ timeRange })
       .then((data) => {
         if (cancelled) return;
