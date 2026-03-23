@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Dot } from "lucide-react";
+import { ArrowDown, ArrowUp, Dot, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type RankChange =
@@ -32,7 +32,21 @@ export function RankChangeBadge({
   change: RankChange | null;
   className?: string;
 }) {
-  if (!change || change.direction === "new") return null;
+  if (!change) return null;
+
+  if (change.direction === "new") {
+    return (
+      <span
+        className={cn(
+          "inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-400/15 text-amber-300",
+          className
+        )}
+        title="New since the previous snapshot"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+      </span>
+    );
+  }
 
   if (change.direction === "same") {
     return (
@@ -41,6 +55,7 @@ export function RankChangeBadge({
           "inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-spotify-subtext",
           className
         )}
+        title="No change"
       >
         <Dot className="h-4 w-4" />
       </span>
@@ -54,6 +69,7 @@ export function RankChangeBadge({
           "inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-300",
           className
         )}
+        title={`Up ${change.delta}`}
       >
         <ArrowUp className="h-3.5 w-3.5" />
       </span>
@@ -66,6 +82,7 @@ export function RankChangeBadge({
         "inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-400/15 text-rose-300",
         className
       )}
+      title={`Down ${change.delta}`}
     >
       <ArrowDown className="h-3.5 w-3.5" />
     </span>

@@ -14,7 +14,6 @@ import {
 } from "../lib/spotify-live";
 import { getSpotifyToken } from "./spotify/tokenHelper";
 
-const SNAPSHOT_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const timeRangeValidator = v.union(
   v.literal("short_term"),
   v.literal("medium_term"),
@@ -94,62 +93,30 @@ async function maybeSaveSnapshot(
   artists: ReturnType<typeof mapSpotifyTopArtists>,
   genres: ReturnType<typeof buildTopGenres>
 ): Promise<number | null> {
-  const latestSnapshotAt = await ctx.runQuery(
-    internal.topHistory.getLatestTopTracksSnapshotTimestamp,
-    {
-      spotifyUserId,
-      timeRange,
-    }
-  );
-
-  if (
-    latestSnapshotAt !== null &&
-    Date.now() - latestSnapshotAt < SNAPSHOT_INTERVAL_MS
-  ) {
-    return null;
-  }
-
-  const syncedAt = Date.now();
-
-  await Promise.all([
-    ctx.runMutation(internal.topHistory.saveTopTracksSnapshot, {
-      spotifyUserId,
-      timeRange,
-      syncedAt,
-      items: tracks.map((track) => ({
-        rank: track.rank,
-        trackSpotifyId: track.trackSpotifyId,
-        trackName: track.trackName,
-        albumName: track.albumName,
-        albumImageUrl: track.albumImageUrl,
-        artistNames: track.artistNames,
-      })),
-    }),
-    ctx.runMutation(internal.topHistory.saveTopArtistsSnapshot, {
-      spotifyUserId,
-      timeRange,
-      syncedAt,
-      items: artists.map((artist) => ({
-        rank: artist.rank,
-        artistSpotifyId: artist.artistSpotifyId,
-        artistName: artist.artistName,
-        imageUrl: artist.imageUrl,
-        genres: artist.genres,
-      })),
-    }),
-    ctx.runMutation(internal.topHistory.saveTopGenresSnapshot, {
-      spotifyUserId,
-      timeRange,
-      syncedAt,
-      items: genres.map((genre) => ({
-        rank: genre.rank,
-        genre: genre.genre,
-        count: genre.count,
-      })),
-    }),
-  ]);
-
-  return syncedAt;
+  return ctx.runMutation(internal.topHistory.saveSnapshotBundleIfNeeded, {
+    spotifyUserId,
+    timeRange,
+    tracks: tracks.map((track) => ({
+      rank: track.rank,
+      trackSpotifyId: track.trackSpotifyId,
+      trackName: track.trackName,
+      albumName: track.albumName,
+      albumImageUrl: track.albumImageUrl,
+      artistNames: track.artistNames,
+    })),
+    artists: artists.map((artist) => ({
+      rank: artist.rank,
+      artistSpotifyId: artist.artistSpotifyId,
+      artistName: artist.artistName,
+      imageUrl: artist.imageUrl,
+      genres: artist.genres,
+    })),
+    genres: genres.map((genre) => ({
+      rank: genre.rank,
+      genre: genre.genre,
+      count: genre.count,
+    })),
+  });
 }
 
 export const getCurrentUserTopData = action({
