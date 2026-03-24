@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useTimeRange } from "@/hooks/useTimeRange";
 import { TimeRangeTabs } from "@/components/stats/TimeRangeTabs";
 import { TopArtistsList } from "@/components/stats/TopArtistsList";
+import { Button } from "@/components/ui/button";
 
 export default function TopArtistsPage() {
-  const { timeRange, setTimeRange } = useTimeRange();
+  const { timeRange, setTimeRange, isPending } = useTimeRange();
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -15,7 +17,14 @@ export default function TopArtistsPage() {
             Your most listened-to artists, fetched live from Spotify
           </p>
         </div>
-        <TimeRangeTabs value={timeRange} onChange={setTimeRange} />
+        <div className="flex items-center gap-3">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/top-artists/history?term=${timeRange}`}>
+              View History
+            </Link>
+          </Button>
+          <TimeRangeTabs value={timeRange} onChange={setTimeRange} isPending={isPending} />
+        </div>
       </div>
 
       <div className="spotify-card">

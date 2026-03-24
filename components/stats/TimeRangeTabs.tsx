@@ -12,23 +12,34 @@ const RANGES: { value: TimeRange; label: string }[] = [
 interface TimeRangeTabsProps {
   value: TimeRange;
   onChange: (value: TimeRange) => void;
+  isPending?: boolean;
 }
 
-export function TimeRangeTabs({ value, onChange }: TimeRangeTabsProps) {
+export function TimeRangeTabs({
+  value,
+  onChange,
+  isPending = false,
+}: TimeRangeTabsProps) {
   return (
-    <div className="flex items-center gap-1 p-1 bg-white/5 rounded-full w-fit">
+    <div className="flex items-center gap-1 rounded-full bg-white/5 p-1 w-fit">
       {RANGES.map((range) => (
         <button
           key={range.value}
           onClick={() => onChange(range.value)}
+          disabled={isPending}
           className={cn(
-            "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
+            "relative px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-wait",
             value === range.value
               ? "bg-spotify-green text-black"
               : "text-spotify-subtext hover:text-white"
           )}
         >
-          {range.label}
+          <span className={cn("transition-opacity", isPending && "opacity-70")}>
+            {range.label}
+          </span>
+          {isPending && value === range.value ? (
+            <span className="absolute inset-x-3 bottom-1 h-px animate-pulse bg-black/60" />
+          ) : null}
         </button>
       ))}
     </div>

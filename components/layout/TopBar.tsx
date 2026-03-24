@@ -5,8 +5,11 @@ import { SyncStatus } from "@/components/stats/SyncStatus";
 
 const PAGE_TITLES: Record<string, string> = {
   "/top-tracks": "Top Tracks",
+  "/top-tracks/history": "Top Tracks History",
   "/top-artists": "Top Artists",
+  "/top-artists/history": "Top Artists History",
   "/top-genres": "Top Genres",
+  "/top-genres/history": "Top Genres History",
   "/history": "Listening History",
   "/taste-profile": "Taste Profile",
   "/recap": "Year in Music",
