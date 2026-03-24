@@ -10,28 +10,32 @@ interface TopArtistsListProps {
   timeRange: TimeRange;
 }
 
+function TopArtistsListSkeleton() {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 p-3">
+          <div className="flex w-12 shrink-0 items-center gap-2">
+            <Skeleton className="h-4 w-4 rounded-full" />
+            <Skeleton className="w-6 h-4" />
+          </div>
+          <Skeleton className="w-12 h-12 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function TopArtistsList({ timeRange }: TopArtistsListProps) {
-  const { data, error, isLoading } = useSpotifyTopData(timeRange);
+  const { data, error, isLoading, isRefreshing } = useSpotifyTopData(timeRange);
   const artists = data?.artists ?? [];
 
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-4 p-3">
-            <div className="flex w-12 shrink-0 items-center gap-2">
-              <Skeleton className="h-4 w-4 rounded-full" />
-              <Skeleton className="w-6 h-4" />
-            </div>
-            <Skeleton className="w-12 h-12 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-36" />
-              <Skeleton className="h-3 w-24" />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+  if (isLoading || isRefreshing) {
+    return <TopArtistsListSkeleton />;
   }
 
   if (error) {

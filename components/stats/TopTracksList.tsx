@@ -10,34 +10,38 @@ interface TopTracksListProps {
   timeRange: TimeRange;
 }
 
+function TopTracksListSkeleton() {
+  return (
+    <div className="space-y-1">
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 p-3">
+          <div className="flex w-12 shrink-0 items-center gap-2">
+            <Skeleton className="w-4 h-4 shrink-0 rounded-full" />
+            <Skeleton className="w-6 h-4 shrink-0" />
+          </div>
+          <Skeleton className="w-12 h-12 rounded shrink-0" />
+          <div className="flex-1 min-w-0 space-y-2">
+            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+          <Skeleton className="hidden md:block h-3 w-28 shrink-0" />
+          <div className="hidden lg:flex items-center gap-2 w-24 shrink-0">
+            <Skeleton className="flex-1 h-1.5 rounded-full" />
+            <Skeleton className="w-5 h-3" />
+          </div>
+          <Skeleton className="hidden sm:block h-3 w-10 shrink-0" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function TopTracksList({ timeRange }: TopTracksListProps) {
-  const { data, error, isLoading } = useSpotifyTopData(timeRange);
+  const { data, error, isLoading, isRefreshing } = useSpotifyTopData(timeRange);
   const tracks = data?.tracks ?? [];
 
-  if (isLoading) {
-    return (
-      <div className="space-y-1">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-4 p-3">
-            <div className="flex w-12 shrink-0 items-center gap-2">
-              <Skeleton className="w-4 h-4 shrink-0 rounded-full" />
-              <Skeleton className="w-6 h-4 shrink-0" />
-            </div>
-            <Skeleton className="w-12 h-12 rounded shrink-0" />
-            <div className="flex-1 min-w-0 space-y-2">
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-            <Skeleton className="hidden md:block h-3 w-28 shrink-0" />
-            <div className="hidden lg:flex items-center gap-2 w-24 shrink-0">
-              <Skeleton className="flex-1 h-1.5 rounded-full" />
-              <Skeleton className="w-5 h-3" />
-            </div>
-            <Skeleton className="hidden sm:block h-3 w-10 shrink-0" />
-          </div>
-        ))}
-      </div>
-    );
+  if (isLoading || isRefreshing) {
+    return <TopTracksListSkeleton />;
   }
 
   if (error) {

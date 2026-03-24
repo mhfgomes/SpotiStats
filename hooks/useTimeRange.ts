@@ -1,9 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState, useTransition } from "react";
 import type { TimeRange } from "@/types/spotify";
 
 export function useTimeRange(initial: TimeRange = "short_term") {
   const [timeRange, setTimeRange] = useState<TimeRange>(initial);
-  return { timeRange, setTimeRange };
+  const [isPending, startPendingTransition] = useTransition();
+
+  const setDeferredTimeRange = (nextTimeRange: TimeRange) => {
+    if (nextTimeRange === timeRange) {
+      return;
+    }
+
+    startPendingTransition(() => {
+      startTransition(() => {
+        setTimeRange(nextTimeRange);
+      });
+    });
+  };
+
+  return { timeRange, setTimeRange: setDeferredTimeRange, isPending };
 }

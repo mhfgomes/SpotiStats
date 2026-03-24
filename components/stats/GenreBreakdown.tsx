@@ -38,22 +38,27 @@ const CustomTooltip = ({
   return null;
 };
 
+function GenreBreakdownSkeleton() {
+  const barWidths = ["85%", "72%", "65%", "58%", "50%", "44%", "38%", "32%", "26%", "20%"];
+
+  return (
+    <div className="space-y-5 py-2">
+      {barWidths.map((w, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <Skeleton className="h-4 w-32 shrink-0" />
+          <Skeleton className="h-6 rounded-sm" style={{ width: w }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
-  const { data, error, isLoading } = useSpotifyTopData(timeRange);
+  const { data, error, isLoading, isRefreshing } = useSpotifyTopData(timeRange);
   const genres = data?.genres ?? [];
 
-  if (isLoading) {
-    const barWidths = ["85%", "72%", "65%", "58%", "50%", "44%", "38%", "32%", "26%", "20%"];
-    return (
-      <div className="space-y-5 py-2">
-        {barWidths.map((w, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <Skeleton className="h-4 w-32 shrink-0" />
-            <Skeleton className="h-6 rounded-sm" style={{ width: w }} />
-          </div>
-        ))}
-      </div>
-    );
+  if (isLoading || isRefreshing) {
+    return <GenreBreakdownSkeleton />;
   }
 
   if (error) {
