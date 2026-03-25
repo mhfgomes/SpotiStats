@@ -37,8 +37,8 @@ export function TrackCard({
 }: TrackCardProps) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
-      <div className="flex w-12 shrink-0 items-center gap-2">
-        <div className="flex w-4 justify-center">
+      <div className="flex w-20 shrink-0 items-center gap-2">
+        <div className="flex w-10 justify-center">
           <RankChangeBadge change={rankChange ?? null} />
         </div>
         {/* Rank */}

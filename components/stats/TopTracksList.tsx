@@ -15,8 +15,8 @@ function TopTracksListSkeleton() {
     <div className="space-y-1">
       {Array.from({ length: 10 }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 p-3">
-          <div className="flex w-12 shrink-0 items-center gap-2">
-            <Skeleton className="w-4 h-4 shrink-0 rounded-full" />
+          <div className="flex w-20 shrink-0 items-center gap-2">
+            <Skeleton className="w-10 h-7 shrink-0 rounded-full" />
             <Skeleton className="w-6 h-4 shrink-0" />
           </div>
           <Skeleton className="w-12 h-12 rounded shrink-0" />

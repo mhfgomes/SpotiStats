@@ -15,8 +15,8 @@ function TopArtistsListSkeleton() {
     <div className="space-y-2">
       {Array.from({ length: 10 }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 p-3">
-          <div className="flex w-12 shrink-0 items-center gap-2">
-            <Skeleton className="h-4 w-4 rounded-full" />
+          <div className="flex w-20 shrink-0 items-center gap-2">
+            <Skeleton className="h-7 w-10 rounded-full" />
             <Skeleton className="w-6 h-4" />
           </div>
           <Skeleton className="w-12 h-12 rounded-full" />

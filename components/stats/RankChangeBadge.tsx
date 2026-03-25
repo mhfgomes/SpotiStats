@@ -34,11 +34,15 @@ export function RankChangeBadge({
 }) {
   if (!change) return null;
 
+  const baseClassName =
+    "inline-flex h-7 min-w-7 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-semibold leading-none tabular-nums";
+
   if (change.direction === "new") {
     return (
       <span
         className={cn(
-          "inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-400/15 text-amber-300",
+          baseClassName,
+          "border-amber-400/30 bg-amber-400/12 text-amber-200",
           className
         )}
         title="New since the previous snapshot"
@@ -52,7 +56,8 @@ export function RankChangeBadge({
     return (
       <span
         className={cn(
-          "inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-spotify-subtext",
+          baseClassName,
+          "border-white/12 bg-white/6 text-spotify-subtext",
           className
         )}
         title="No change"
@@ -66,12 +71,14 @@ export function RankChangeBadge({
     return (
       <span
         className={cn(
-          "inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-300",
+          baseClassName,
+          "border-emerald-400/30 bg-emerald-400/12 text-emerald-200",
           className
         )}
         title={`Up ${change.delta}`}
       >
         <ArrowUp className="h-3.5 w-3.5" />
+        <span>{change.delta}</span>
       </span>
     );
   }
@@ -79,12 +86,14 @@ export function RankChangeBadge({
   return (
     <span
       className={cn(
-        "inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-400/15 text-rose-300",
+        baseClassName,
+        "border-rose-400/30 bg-rose-400/12 text-rose-200",
         className
       )}
       title={`Down ${change.delta}`}
     >
       <ArrowDown className="h-3.5 w-3.5" />
+      <span>{change.delta}</span>
     </span>
   );
 }

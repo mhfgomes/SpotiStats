@@ -9,7 +9,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/top-artists": "Top Artists",
   "/top-artists/history": "Top Artists History",
   "/top-genres": "Top Genres",
-  "/top-genres/history": "Top Genres History",
   "/history": "Listening History",
   "/taste-profile": "Taste Profile",
   "/recap": "Year in Music",
