@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface RecapDownloadButtonProps {
   cardRef: React.RefObject<HTMLDivElement | null>;
@@ -37,10 +38,10 @@ export function RecapDownloadButton({ cardRef }: RecapDownloadButtonProps) {
   };
 
   return (
-    <button
+    <Button
       onClick={handleDownload}
       disabled={isGenerating}
-      className="flex items-center gap-2 bg-spotify-green hover:bg-[#1ed760] disabled:opacity-70 disabled:cursor-not-allowed text-black font-bold py-2.5 px-5 rounded-full transition-colors text-sm"
+      className="h-11 rounded-xl px-5"
     >
       {isGenerating ? (
         <>
@@ -53,6 +54,6 @@ export function RecapDownloadButton({ cardRef }: RecapDownloadButtonProps) {
           Download PNG
         </>
       )}
-    </button>
+    </Button>
   );
 }

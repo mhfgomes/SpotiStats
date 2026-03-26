@@ -22,8 +22,13 @@ export default defineSchema({
     trackSpotifyId: v.string(),
     trackName: v.string(),
     albumName: v.string(),
+    albumExternalUrl: v.optional(v.string()),
     albumImageUrl: v.optional(v.string()),
     artistNames: v.array(v.string()),
+    artistSpotifyIds: v.optional(v.array(v.string())),
+    durationMs: v.optional(v.number()),
+    popularity: v.optional(v.number()),
+    externalUrl: v.optional(v.string()),
   }).index("by_user_range_syncedAt", ["spotifyUserId", "timeRange", "syncedAt"]),
 
   topArtistHistory: defineTable({

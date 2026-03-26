@@ -1,14 +1,5 @@
-"use client";
-
-import { TopHistoryPage } from "@/components/stats/TopHistoryPage";
+import { redirect } from "next/navigation";
 
 export default function TopArtistsHistoryPage() {
-  return (
-    <TopHistoryPage
-      kind="artists"
-      backHref="/top-artists"
-      backLabel="Back to Top Artists"
-      description="Browse saved snapshots of your top artists across Spotify syncs."
-    />
-  );
+  redirect("/top-artists");
 }

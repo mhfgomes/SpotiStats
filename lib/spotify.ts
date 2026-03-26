@@ -1,5 +1,6 @@
 import type {
   SpotifyPagingObject,
+  SpotifySeveralTracksResponse,
   SpotifyTrack,
   SpotifyArtist,
   SpotifyRecentlyPlayedResponse,
@@ -79,4 +80,26 @@ export async function getRecentlyPlayed(
     "/me/player/recently-played",
     params
   );
+}
+
+export async function getTracksByIds(
+  accessToken: string,
+  trackIds: string[]
+): Promise<SpotifyTrack[]> {
+  if (trackIds.length === 0) return [];
+
+  const chunks: string[][] = [];
+  for (let index = 0; index < trackIds.length; index += 50) {
+    chunks.push(trackIds.slice(index, index + 50));
+  }
+
+  const responses = await Promise.all(
+    chunks.map((ids) =>
+      spotifyFetch<SpotifySeveralTracksResponse>(accessToken, "/tracks", {
+        ids: ids.join(","),
+      })
+    )
+  );
+
+  return responses.flatMap((response) => response.tracks);
 }

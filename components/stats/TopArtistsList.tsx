@@ -72,6 +72,7 @@ export function TopArtistsList({ timeRange }: TopArtistsListProps) {
             imageUrl={artist.imageUrl}
             externalUrl={artist.externalUrl}
             rankChange={getRankChange(artist.rank, previousRank)}
+            comparisonSnapshotSyncedAt={data?.previousArtistSnapshotSyncedAt}
           />
         );
       })}

@@ -9,6 +9,14 @@ export type RankChange =
   | { direction: "same"; delta: 0 }
   | { direction: "new"; delta: null };
 
+function formatComparisonSnapshotDate(timestamp: number) {
+  return new Date(timestamp).toLocaleDateString([], {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}
+
 export function getRankChange(
   currentRank: number,
   previousRank?: number | null
@@ -27,15 +35,26 @@ export function getRankChange(
 
 export function RankChangeBadge({
   change,
+  comparisonSnapshotSyncedAt,
   className,
 }: {
   change: RankChange | null;
+  comparisonSnapshotSyncedAt?: number | null;
   className?: string;
 }) {
   if (!change) return null;
 
   const baseClassName =
     "inline-flex h-7 min-w-7 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-semibold leading-none tabular-nums";
+  const tooltipLabel = comparisonSnapshotSyncedAt
+    ? formatComparisonSnapshotDate(comparisonSnapshotSyncedAt)
+    : change.direction === "new"
+      ? "New since previous snapshot"
+      : change.direction === "same"
+        ? "No change"
+        : change.direction === "up"
+          ? `Up ${change.delta}`
+          : `Down ${change.delta}`;
 
   if (change.direction === "new") {
     return (
@@ -45,7 +64,7 @@ export function RankChangeBadge({
           "border-amber-400/30 bg-amber-400/12 text-amber-200",
           className
         )}
-        title="New since the previous snapshot"
+        title={tooltipLabel}
       >
         <Sparkles className="h-3.5 w-3.5" />
       </span>
@@ -60,7 +79,7 @@ export function RankChangeBadge({
           "border-white/12 bg-white/6 text-spotify-subtext",
           className
         )}
-        title="No change"
+        title={tooltipLabel}
       >
         <Dot className="h-4 w-4" />
       </span>
@@ -75,7 +94,7 @@ export function RankChangeBadge({
           "border-emerald-400/30 bg-emerald-400/12 text-emerald-200",
           className
         )}
-        title={`Up ${change.delta}`}
+        title={tooltipLabel}
       >
         <ArrowUp className="h-3.5 w-3.5" />
         <span>{change.delta}</span>
@@ -90,7 +109,7 @@ export function RankChangeBadge({
         "border-rose-400/30 bg-rose-400/12 text-rose-200",
         className
       )}
-      title={`Down ${change.delta}`}
+      title={tooltipLabel}
     >
       <ArrowDown className="h-3.5 w-3.5" />
       <span>{change.delta}</span>

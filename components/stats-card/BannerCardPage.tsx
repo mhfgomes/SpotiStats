@@ -3,25 +3,63 @@
 import { useState, useCallback } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Check, Link2, Code, RefreshCw, ExternalLink } from "lucide-react";
+import {
+  Check,
+  Code,
+  ExternalLink,
+  Link2,
+  RefreshCw,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { THEME_SWATCHES } from "@/lib/themes";
 import type { CardThemeKey } from "@/lib/themes";
 
 const BANNER_META = {
-  classic: { label: "Classic", desc: "Top artist, genres, and tracks", size: "1200 × 630", aspect: "1200/630" },
-  tracks:  { label: "Tracks",  desc: "8 top tracks in two columns",    size: "1200 × 630", aspect: "1200/630" },
-  artists: { label: "Artists", desc: "Top 5 artists with avatars",     size: "1200 × 630", aspect: "1200/630" },
-  compact: { label: "Compact", desc: "Square card for social media",   size: "600 × 600",  aspect: "1/1"       },
+  classic: {
+    label: "Classic",
+    desc: "Top artist, genres, and tracks",
+    size: "1200 × 630",
+    aspect: "1200/630",
+  },
+  tracks: {
+    label: "Tracks",
+    desc: "8 top tracks in two columns",
+    size: "1200 × 630",
+    aspect: "1200/630",
+  },
+  artists: {
+    label: "Artists",
+    desc: "Top 5 artists with avatars",
+    size: "1200 × 630",
+    aspect: "1200/630",
+  },
+  compact: {
+    label: "Compact",
+    desc: "Square card for social media",
+    size: "600 × 600",
+    aspect: "1/1",
+  },
 } as const;
 
 type BannerType = keyof typeof BANNER_META;
 
 const RANGES = [
-  { id: "short_term",  label: "Last 4 weeks" },
+  { id: "short_term", label: "Last 4 weeks" },
   { id: "medium_term", label: "Last 6 months" },
-  { id: "long_term",   label: "All time" },
+  { id: "long_term", label: "All time" },
 ] as const;
 
 type RangeId = (typeof RANGES)[number]["id"];
@@ -37,6 +75,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   const [range, setRange] = useState<RangeId>("short_term");
   const [previewKey, setPreviewKey] = useState(0);
   const [copied, setCopied] = useState<"url" | "html" | "md" | null>(null);
+  const [wrapWithLink, setWrapWithLink] = useState(true);
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const meta = BANNER_META[type];
@@ -46,11 +85,15 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
     : null;
 
   const htmlSnippet = cardUrl
-    ? `<a href="${baseUrl}">\n  <img src="${cardUrl}" alt="${user?.displayName ?? "Spotify"} Stats" />\n</a>`
+    ? wrapWithLink
+      ? `<a href="${baseUrl}">\n  <img src="${cardUrl}" alt="${user?.displayName ?? "Spotify"} Stats" />\n</a>`
+      : `<img src="${cardUrl}" alt="${user?.displayName ?? "Spotify"} Stats" />`
     : "";
 
   const mdSnippet = cardUrl
-    ? `[![${user?.displayName ?? "Spotify"} Stats](${cardUrl})](${baseUrl})`
+    ? wrapWithLink
+      ? `[![${user?.displayName ?? "Spotify"} Stats](${cardUrl})](${baseUrl})`
+      : `![${user?.displayName ?? "Spotify"} Stats](${cardUrl})`
     : "";
 
   const copy = useCallback((text: string, which: typeof copied) => {
@@ -61,187 +104,272 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
 
   if (user === undefined) {
     return (
-      <div className="max-w-5xl mx-auto space-y-4">
-        <div className="flex gap-6 mt-2">
-          <Skeleton className="w-64 h-80 rounded-xl" />
-          <Skeleton className="flex-1 h-80 rounded-xl" />
+      <div className="mx-auto max-w-5xl space-y-4">
+        <div className="mt-2 flex gap-6">
+          <Skeleton className="h-80 w-72 rounded-2xl" />
+          <Skeleton className="h-80 flex-1 rounded-2xl" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="mx-auto max-w-5xl">
       <div className="mb-6">
-        <p className="text-spotify-subtext text-sm">{meta.desc} — {meta.size}</p>
+        <p className="text-sm text-spotify-subtext">
+          {meta.desc} - {meta.size}
+        </p>
       </div>
 
-      <div className="flex gap-6 items-start">
-
-        {/* ── Left: options ─────────────────────────── */}
-        <aside className="w-64 shrink-0 space-y-4">
-
-          {/* Theme */}
-          <div className="spotify-card p-4 space-y-3">
-            <p className="text-xs font-semibold text-spotify-subtext uppercase tracking-widest">Theme</p>
-            <div className="grid grid-cols-3 gap-2">
-              {THEME_SWATCHES.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setTheme(t.id)}
-                  title={t.label}
-                  className={cn(
-                    "flex flex-col items-center gap-1.5 p-2 rounded-lg transition-colors border",
-                    theme === t.id
-                      ? "border-white/40 bg-white/8"
-                      : "border-white/5 hover:bg-white/5"
-                  )}
-                >
-                  <div
-                    className="w-full h-8 rounded-md border border-white/10 relative overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${t.bg1} 0%, ${t.bg2} 100%)` }}
+      <div className="flex items-start gap-6 max-lg:flex-col">
+        <aside className="w-72 shrink-0 space-y-4 max-lg:w-full">
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle>Theme</CardTitle>
+              <CardDescription>Choose the visual style for this card.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RadioGroup
+                value={theme}
+                onValueChange={(value) => setTheme(value as CardThemeKey)}
+                className="grid grid-cols-3 gap-2"
+              >
+                {THEME_SWATCHES.map((swatch) => (
+                  <Label
+                    key={swatch.id}
+                    htmlFor={`theme-${type}-${swatch.id}`}
+                    className="cursor-pointer"
                   >
-                    <div
-                      className="absolute bottom-1 right-1 w-2 h-2 rounded-full"
-                      style={{ background: t.dot }}
+                    <RadioGroupItem
+                      id={`theme-${type}-${swatch.id}`}
+                      value={swatch.id}
+                      className="sr-only"
                     />
-                    {theme === t.id && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Check className="w-3.5 h-3.5 text-white drop-shadow" />
+                    <div
+                      className={cn(
+                        "group rounded-xl border border-white/8 bg-white/[0.03] p-2 transition-all hover:border-white/15 hover:bg-white/[0.06]",
+                        theme === swatch.id &&
+                          "border-primary/70 bg-primary/10 ring-1 ring-primary/40"
+                      )}
+                    >
+                      <div
+                        className="relative h-10 w-full overflow-hidden rounded-lg border border-white/10"
+                        style={{
+                          background: `linear-gradient(135deg, ${swatch.bg1} 0%, ${swatch.bg2} 100%)`,
+                        }}
+                      >
+                        <div
+                          className="absolute bottom-1.5 right-1.5 h-2.5 w-2.5 rounded-full"
+                          style={{ background: swatch.dot }}
+                        />
+                        {theme === swatch.id && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                            <Check className="h-4 w-4 text-white drop-shadow" />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <span className={cn("text-[10px] font-medium leading-none", theme === t.id ? "text-white" : "text-spotify-subtext")}>
-                    {t.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+                      <p
+                        className={cn(
+                          "mt-2 text-center text-[11px] font-medium leading-none",
+                          theme === swatch.id ? "text-white" : "text-muted-foreground"
+                        )}
+                      >
+                        {swatch.label}
+                      </p>
+                    </div>
+                  </Label>
+                ))}
+              </RadioGroup>
+            </CardContent>
+          </Card>
 
-          {/* Time range */}
-          <div className="spotify-card p-4 space-y-3">
-            <p className="text-xs font-semibold text-spotify-subtext uppercase tracking-widest">Time range</p>
-            <div className="space-y-2">
-              {RANGES.map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => setRange(r.id)}
-                  className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors border",
-                    range === r.id
-                      ? "bg-white/8 border-white/20 text-white"
-                      : "border-white/5 hover:bg-white/5 text-spotify-subtext"
-                  )}
-                >
-                  <span className="text-sm font-medium">{r.label}</span>
-                  {range === r.id && <Check className="w-3.5 h-3.5 text-white" />}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle>Time range</CardTitle>
+              <CardDescription>Pick which Spotify window to render.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RadioGroup
+                value={range}
+                onValueChange={(value) => setRange(value as RangeId)}
+                className="gap-2"
+              >
+                {RANGES.map((item) => (
+                  <Label
+                    key={item.id}
+                    htmlFor={`range-${type}-${item.id}`}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 transition-colors",
+                      range === item.id
+                        ? "border-primary/60 bg-primary/10 text-white"
+                        : "border-white/8 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-white"
+                    )}
+                  >
+                    <RadioGroupItem
+                      id={`range-${type}-${item.id}`}
+                      value={item.id}
+                    />
+                    <span className="text-sm">{item.label}</span>
+                  </Label>
+                ))}
+              </RadioGroup>
+            </CardContent>
+          </Card>
         </aside>
 
-        {/* ── Right: preview + share ──────────────── */}
-        <div className="flex-1 min-w-0 space-y-4">
-
-          {/* Preview */}
-          <div className="spotify-card p-4">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-semibold text-spotify-subtext uppercase tracking-widest">Preview</p>
+        <div className="min-w-0 flex-1 space-y-4">
+          <Card>
+            <CardHeader className="flex-row items-center justify-between space-y-0 pb-4">
+              <div>
+                <CardTitle>Preview</CardTitle>
+                <CardDescription>{meta.label} card output</CardDescription>
+              </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-spotify-subtext">{meta.size}</span>
-                <button
-                  onClick={() => setPreviewKey((k) => k + 1)}
-                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors text-spotify-subtext hover:text-white"
+                <span className="text-xs text-muted-foreground">{meta.size}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setPreviewKey((key) => key + 1)}
                   title="Refresh preview"
+                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-white"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                </button>
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </Button>
                 {cardUrl && (
-                  <a
-                    href={cardUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-1.5 rounded-full hover:bg-white/10 transition-colors text-spotify-subtext hover:text-white"
-                    title="Open in new tab"
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    asChild
+                    className="h-8 w-8 rounded-lg text-muted-foreground hover:text-white"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                    <a
+                      href={cardUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open in new tab"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </Button>
                 )}
               </div>
-            </div>
-            {cardUrl ? (
-              <div className="rounded-lg overflow-hidden bg-black/20">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  key={`${cardUrl}-${previewKey}`}
-                  src={cardUrl}
-                  alt="Stats card preview"
-                  className="w-full"
+            </CardHeader>
+            <CardContent>
+              {cardUrl ? (
+                <div className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    key={`${cardUrl}-${previewKey}`}
+                    src={cardUrl}
+                    alt="Stats card preview"
+                    className="w-full"
+                    style={{ aspectRatio: meta.aspect }}
+                  />
+                </div>
+              ) : (
+                <Skeleton
+                  className="w-full rounded-xl"
                   style={{ aspectRatio: meta.aspect }}
                 />
-              </div>
-            ) : (
-              <Skeleton className="w-full rounded-lg" style={{ aspectRatio: meta.aspect }} />
-            )}
-          </div>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Share */}
-          <div className="spotify-card p-4 space-y-4">
-            <p className="text-xs font-semibold text-spotify-subtext uppercase tracking-widest">Share</p>
-
-            <div>
-              <p className="text-xs text-spotify-subtext mb-1.5">Direct image URL</p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-[11px] bg-black/40 rounded-lg px-3 py-2.5 truncate text-spotify-subtext border border-white/5 font-mono">
-                  {cardUrl ?? "—"}
-                </code>
-                <button
-                  onClick={() => cardUrl && copy(cardUrl, "url")}
-                  disabled={!cardUrl}
-                  className="shrink-0 flex items-center gap-1.5 bg-spotify-green hover:bg-[#1ed760] disabled:opacity-40 text-black font-bold text-xs py-2.5 px-3 rounded-lg transition-colors"
-                >
-                  {copied === "url" ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
-                  {copied === "url" ? "Copied!" : "Copy"}
-                </button>
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle>Share</CardTitle>
+              <CardDescription>Copy a direct URL or embed snippet.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3 rounded-xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                <Checkbox
+                  id={`wrap-link-${type}`}
+                  checked={wrapWithLink}
+                  onCheckedChange={(checked) => setWrapWithLink(checked === true)}
+                  className="mt-0.5"
+                />
+                <div className="space-y-1">
+                  <Label htmlFor={`wrap-link-${type}`}>Link image back to SpotiStats</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Applies to the HTML and Markdown snippets.
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <p className="text-xs text-spotify-subtext mb-1.5">HTML embed</p>
-              <div className="flex items-start gap-2">
-                <pre className="flex-1 text-[11px] bg-black/40 rounded-lg px-3 py-2.5 text-spotify-subtext border border-white/5 font-mono overflow-x-auto whitespace-pre">
-                  {htmlSnippet || "—"}
-                </pre>
-                <button
-                  onClick={() => copy(htmlSnippet, "html")}
-                  disabled={!cardUrl}
-                  className="shrink-0 flex items-center gap-1.5 bg-white/10 hover:bg-white/15 disabled:opacity-40 text-white font-bold text-xs py-2.5 px-3 rounded-lg transition-colors"
-                >
-                  {copied === "html" ? <Check className="w-3.5 h-3.5" /> : <Code className="w-3.5 h-3.5" />}
-                  {copied === "html" ? "Copied!" : "HTML"}
-                </button>
-              </div>
-            </div>
+              <Separator />
 
-            <div>
-              <p className="text-xs text-spotify-subtext mb-1.5">Markdown (GitHub README)</p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-[11px] bg-black/40 rounded-lg px-3 py-2.5 truncate text-spotify-subtext border border-white/5 font-mono">
-                  {mdSnippet || "—"}
-                </code>
-                <button
-                  onClick={() => copy(mdSnippet, "md")}
-                  disabled={!cardUrl}
-                  className="shrink-0 flex items-center gap-1.5 bg-white/10 hover:bg-white/15 disabled:opacity-40 text-white font-bold text-xs py-2.5 px-3 rounded-lg transition-colors"
-                >
-                  {copied === "md" ? <Check className="w-3.5 h-3.5" /> : <Code className="w-3.5 h-3.5" />}
-                  {copied === "md" ? "Copied!" : "MD"}
-                </button>
+              <div className="space-y-2">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                  Direct image URL
+                </p>
+                <div className="flex items-center gap-2 max-sm:flex-col">
+                  <code className="min-w-0 flex-1 truncate rounded-xl border border-white/8 bg-black/30 px-3 py-2.5 font-mono text-[11px] text-muted-foreground">
+                    {cardUrl ?? "-"}
+                  </code>
+                  <Button
+                    onClick={() => cardUrl && copy(cardUrl, "url")}
+                    disabled={!cardUrl}
+                    className="rounded-xl max-sm:w-full"
+                  >
+                    {copied === "url" ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : (
+                      <Link2 className="h-3.5 w-3.5" />
+                    )}
+                    {copied === "url" ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
               </div>
-            </div>
-          </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                  HTML embed
+                </p>
+                <div className="flex items-start gap-2 max-sm:flex-col">
+                  <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre rounded-xl border border-white/8 bg-black/30 px-3 py-2.5 font-mono text-[11px] text-muted-foreground">
+                    {htmlSnippet || "-"}
+                  </pre>
+                  <Button
+                    variant="secondary"
+                    onClick={() => copy(htmlSnippet, "html")}
+                    disabled={!cardUrl}
+                    className="rounded-xl max-sm:w-full"
+                  >
+                    {copied === "html" ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : (
+                      <Code className="h-3.5 w-3.5" />
+                    )}
+                    {copied === "html" ? "Copied!" : "HTML"}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                  Markdown
+                </p>
+                <div className="flex items-center gap-2 max-sm:flex-col">
+                  <code className="min-w-0 flex-1 truncate rounded-xl border border-white/8 bg-black/30 px-3 py-2.5 font-mono text-[11px] text-muted-foreground">
+                    {mdSnippet || "-"}
+                  </code>
+                  <Button
+                    variant="secondary"
+                    onClick={() => copy(mdSnippet, "md")}
+                    disabled={!cardUrl}
+                    className="rounded-xl max-sm:w-full"
+                  >
+                    {copied === "md" ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : (
+                      <Code className="h-3.5 w-3.5" />
+                    )}
+                    {copied === "md" ? "Copied!" : "MD"}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

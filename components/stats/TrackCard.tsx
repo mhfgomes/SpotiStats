@@ -19,6 +19,7 @@ interface TrackCardProps {
   externalUrl: string;
   popularity: number;
   rankChange?: RankChange | null;
+  comparisonSnapshotSyncedAt?: number | null;
 }
 
 export function TrackCard({
@@ -34,12 +35,16 @@ export function TrackCard({
   externalUrl,
   popularity,
   rankChange,
+  comparisonSnapshotSyncedAt,
 }: TrackCardProps) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
       <div className="flex w-20 shrink-0 items-center gap-2">
         <div className="flex w-10 justify-center">
-          <RankChangeBadge change={rankChange ?? null} />
+          <RankChangeBadge
+            change={rankChange ?? null}
+            comparisonSnapshotSyncedAt={comparisonSnapshotSyncedAt}
+          />
         </div>
         {/* Rank */}
         <span className="text-spotify-subtext text-sm font-mono w-6 text-right shrink-0">

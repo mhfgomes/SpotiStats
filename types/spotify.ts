@@ -68,6 +68,10 @@ export interface SpotifyPagingObject<T> {
   href: string;
 }
 
+export interface SpotifySeveralTracksResponse {
+  tracks: SpotifyTrack[];
+}
+
 export interface SpotifyRecentlyPlayedResponse {
   items: SpotifyPlayHistoryItem[];
   next: string | null;

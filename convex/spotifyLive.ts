@@ -5,7 +5,7 @@ import type { ActionCtx } from "./_generated/server";
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { getTopArtists, getTopTracks } from "../lib/spotify";
+import { getTopArtists, getTopTracks, getTracksByIds } from "../lib/spotify";
 import {
   buildTasteProfile,
   buildTopGenres,
@@ -33,6 +33,9 @@ interface CurrentUserTopDataResult {
   genres: ReturnType<typeof buildTopGenres>;
   tasteProfile: ReturnType<typeof buildTasteProfile>;
   hasComparisonSnapshot: boolean;
+  previousTrackSnapshotSyncedAt: number | null;
+  previousArtistSnapshotSyncedAt: number | null;
+  previousGenreSnapshotSyncedAt: number | null;
   previousTrackRanks: Record<string, number>;
   previousArtistRanks: Record<string, number>;
   previousGenreRanks: Record<string, number>;
@@ -48,15 +51,23 @@ interface PublicCardDataResult {
   genres: ReturnType<typeof buildTopGenres>;
 }
 
+interface TrackSnapshotMetadataResult {
+  trackSpotifyId: string;
+  popularity: number;
+  durationMs: number;
+  albumExternalUrl?: string;
+  artistSpotifyIds: string[];
+  externalUrl: string;
+}
+
 function getComparisonSnapshot<T extends { rank: number }>(
-  snapshots: SnapshotGroup<T>[],
-  savedSnapshotAt: number | null
+  snapshots: SnapshotGroup<T>[]
 ): SnapshotGroup<T> | null {
   if (snapshots.length === 0) return null;
-  if (savedSnapshotAt !== null && snapshots[0]?.syncedAt === savedSnapshotAt) {
-    return snapshots[1] ?? null;
-  }
-  return snapshots[0] ?? null;
+
+  // The newest saved snapshot is the current snapshot for the response because
+  // we persist it before loading history. Compare against the one before it.
+  return snapshots[1] ?? null;
 }
 
 function buildRankMap<T extends { rank: number }>(
@@ -101,8 +112,13 @@ async function maybeSaveSnapshot(
       trackSpotifyId: track.trackSpotifyId,
       trackName: track.trackName,
       albumName: track.albumName,
+      albumExternalUrl: track.albumExternalUrl,
       albumImageUrl: track.albumImageUrl,
       artistNames: track.artistNames,
+      artistSpotifyIds: track.artistSpotifyIds,
+      durationMs: track.durationMs,
+      popularity: track.popularity,
+      externalUrl: track.externalUrl,
     })),
     artists: artists.map((artist) => ({
       rank: artist.rank,
@@ -143,7 +159,7 @@ export const getCurrentUserTopData = action({
     const genres = buildTopGenres(artists);
     const tasteProfile = buildTasteProfile(artists);
 
-    const savedSnapshotAt = await maybeSaveSnapshot(
+    await maybeSaveSnapshot(
       ctx,
       spotifyUser._id,
       timeRange,
@@ -170,16 +186,20 @@ export const getCurrentUserTopData = action({
       }),
     ]);
 
+    const previousTrackSnapshot = getComparisonSnapshot(trackHistory);
+    const previousArtistSnapshot = getComparisonSnapshot(artistHistory);
+    const previousGenreSnapshot = getComparisonSnapshot(genreHistory);
+
     const previousTracks = buildRankMap(
-      getComparisonSnapshot(trackHistory, savedSnapshotAt),
+      previousTrackSnapshot,
       (item: { trackSpotifyId: string }) => item.trackSpotifyId
     );
     const previousArtists = buildRankMap(
-      getComparisonSnapshot(artistHistory, savedSnapshotAt),
+      previousArtistSnapshot,
       (item: { artistSpotifyId: string }) => item.artistSpotifyId
     );
     const previousGenres = buildRankMap(
-      getComparisonSnapshot(genreHistory, savedSnapshotAt),
+      previousGenreSnapshot,
       (item: { genre: string }) => item.genre
     );
 
@@ -192,6 +212,9 @@ export const getCurrentUserTopData = action({
         previousTracks !== null ||
         previousArtists !== null ||
         previousGenres !== null,
+      previousTrackSnapshotSyncedAt: previousTrackSnapshot?.syncedAt ?? null,
+      previousArtistSnapshotSyncedAt: previousArtistSnapshot?.syncedAt ?? null,
+      previousGenreSnapshotSyncedAt: previousGenreSnapshot?.syncedAt ?? null,
       previousTrackRanks: previousTracks ?? {},
       previousArtistRanks: previousArtists ?? {},
       previousGenreRanks: previousGenres ?? {},
@@ -249,5 +272,37 @@ export const getPublicCardData = action({
       artists,
       genres,
     };
+  },
+});
+
+export const getTrackSnapshotMetadata = action({
+  args: {
+    trackIds: v.array(v.string()),
+  },
+  handler: async (
+    ctx,
+    { trackIds }
+  ): Promise<TrackSnapshotMetadataResult[]> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    if (trackIds.length === 0) {
+      return [];
+    }
+
+    const accessToken = await getSpotifyToken(ctx, identity.subject);
+    const uniqueTrackIds = [...new Set(trackIds)];
+    const tracks = await getTracksByIds(accessToken, uniqueTrackIds);
+
+    return tracks.map((track) => ({
+      trackSpotifyId: track.id,
+      popularity: track.popularity,
+      durationMs: track.duration_ms,
+      albumExternalUrl: track.album.external_urls?.spotify,
+      artistSpotifyIds: track.artists.map((artist) => artist.id),
+      externalUrl: track.external_urls.spotify,
+    }));
   },
 });

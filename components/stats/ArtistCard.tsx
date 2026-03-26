@@ -12,6 +12,7 @@ interface ArtistCardProps {
   imageUrl?: string;
   externalUrl: string;
   rankChange?: RankChange | null;
+  comparisonSnapshotSyncedAt?: number | null;
 }
 
 export function ArtistCard({
@@ -21,12 +22,16 @@ export function ArtistCard({
   imageUrl,
   externalUrl,
   rankChange,
+  comparisonSnapshotSyncedAt,
 }: ArtistCardProps) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
       <div className="flex w-20 shrink-0 items-center gap-2">
         <div className="flex w-10 justify-center">
-          <RankChangeBadge change={rankChange ?? null} />
+          <RankChangeBadge
+            change={rankChange ?? null}
+            comparisonSnapshotSyncedAt={comparisonSnapshotSyncedAt}
+          />
         </div>
         <span className="text-spotify-subtext text-sm font-mono w-6 text-right shrink-0">
           {rank}

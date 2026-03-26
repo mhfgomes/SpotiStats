@@ -17,6 +17,9 @@ interface SpotifyTopData {
   genres: LiveTopGenre[];
   tasteProfile: TasteProfilePoint[];
   hasComparisonSnapshot: boolean;
+  previousTrackSnapshotSyncedAt: number | null;
+  previousArtistSnapshotSyncedAt: number | null;
+  previousGenreSnapshotSyncedAt: number | null;
   previousTrackRanks: Record<string, number>;
   previousArtistRanks: Record<string, number>;
   previousGenreRanks: Record<string, number>;

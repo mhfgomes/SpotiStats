@@ -84,6 +84,7 @@ export function TopTracksList({ timeRange }: TopTracksListProps) {
             externalUrl={track.externalUrl}
             popularity={track.popularity}
             rankChange={getRankChange(track.rank, previousRank)}
+            comparisonSnapshotSyncedAt={data?.previousTrackSnapshotSyncedAt}
           />
         );
       })}
