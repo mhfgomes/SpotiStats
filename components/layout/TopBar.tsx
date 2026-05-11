@@ -1,17 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 const PAGE_TITLES: Record<string, string> = {
+  "/account": "Account",
   "/top-tracks": "Top Tracks",
   "/top-artists": "Top Artists",
   "/top-genres": "Top Genres",
@@ -63,6 +66,13 @@ export function TopBar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem asChild className="gap-2">
+              <Link href="/account">
+                <User className="h-4 w-4" />
+                <span>Account</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               variant="destructive"
               onClick={() => signOut()}
