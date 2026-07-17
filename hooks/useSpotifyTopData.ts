@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { TimeRange } from "@/types/spotify";
@@ -30,6 +30,7 @@ interface SpotifyTopDataState {
   error: string | null;
   isLoading: boolean;
   isRefreshing: boolean;
+  refetch: () => void;
 }
 
 type SpotifyTopDataAction =
@@ -38,9 +39,9 @@ type SpotifyTopDataAction =
   | { type: "error"; error: string };
 
 function spotifyTopDataReducer(
-  state: SpotifyTopDataState,
+  state: Omit<SpotifyTopDataState, "refetch">,
   action: SpotifyTopDataAction
-): SpotifyTopDataState {
+): Omit<SpotifyTopDataState, "refetch"> {
   switch (action.type) {
     case "request":
       return {
@@ -76,6 +77,11 @@ export function useSpotifyTopData(timeRange: TimeRange): SpotifyTopDataState {
     isLoading: true,
     isRefreshing: false,
   });
+  const [reloadToken, setReloadToken] = useReducer((n: number) => n + 1, 0);
+
+  const refetch = useCallback(() => {
+    setReloadToken();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -101,7 +107,7 @@ export function useSpotifyTopData(timeRange: TimeRange): SpotifyTopDataState {
     return () => {
       cancelled = true;
     };
-  }, [getTopData, timeRange]);
+  }, [getTopData, timeRange, reloadToken]);
 
-  return state;
+  return { ...state, refetch };
 }

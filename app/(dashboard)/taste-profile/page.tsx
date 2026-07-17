@@ -3,6 +3,10 @@
 import { TasteRadar } from "@/components/stats/TasteRadar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
+import {
+  QueryEmptyState,
+  QueryErrorState,
+} from "@/components/stats/QueryState";
 
 const AXIS_META: Record<string, { desc: string }> = {
   Energy:       { desc: "Electronic, dance, hip-hop, metal — high-tempo and high-intensity music" },
@@ -59,13 +63,14 @@ function TasteProfileSkeleton() {
 }
 
 export default function TasteProfilePage() {
-  const { data, error, isLoading } = useSpotifyTopData("short_term");
+  const { data, error, isLoading, isRefreshing, refetch } =
+    useSpotifyTopData("short_term");
   const profile = data?.tasteProfile ?? [];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       <div className="mb-6">
-        <p className="text-spotify-subtext text-sm">
+        <p className="text-sm text-spotify-subtext">
           Based on your top artists&apos; genres over the past 4 weeks
         </p>
       </div>
@@ -73,40 +78,47 @@ export default function TasteProfilePage() {
       {isLoading ? (
         <TasteProfileSkeleton />
       ) : error ? (
-        <div className="spotify-card p-6 flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-spotify-subtext text-sm">Could not load taste profile.</p>
-          <p className="text-spotify-subtext text-xs mt-1">{error}</p>
+        <div className="spotify-card">
+          <QueryErrorState
+            title="Could not load taste profile."
+            description={error}
+            onRetry={refetch}
+            isRetrying={isRefreshing}
+          />
         </div>
       ) : profile.length === 0 ? (
-        <div className="spotify-card p-6 flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-spotify-subtext text-sm">No taste profile data yet.</p>
-          <p className="text-spotify-subtext text-xs mt-1">
-            Spotify did not return enough artist genre data yet.
-          </p>
+        <div className="spotify-card">
+          <QueryEmptyState
+            title="No taste profile data yet."
+            description="Spotify did not return enough artist genre data yet."
+            onRetry={refetch}
+          />
         </div>
       ) : (
-        <div className="spotify-card p-6 flex flex-col lg:flex-row gap-6">
+        <div className="spotify-card flex flex-col gap-6 p-6 lg:flex-row">
 
           {/* Radar chart */}
-          <div className="lg:w-1/2 shrink-0">
+          <div className="shrink-0 lg:w-1/2">
             <TasteRadar profile={profile} />
           </div>
 
           {/* Axis breakdown */}
-          <div className="flex-1 flex flex-col justify-center gap-4">
+          <div className="flex flex-1 flex-col justify-center gap-4">
             {profile.map(({ axis, value }) => (
               <div key={axis}>
-                <div className="flex items-center justify-between mb-1">
+                <div className="mb-1 flex items-center justify-between">
                   <span className="text-sm font-semibold text-white">{axis}</span>
-                  <span className="text-sm font-bold text-spotify-green tabular-nums">{value}%</span>
+                  <span className="text-sm font-bold tabular-nums text-spotify-green">
+                    {value}%
+                  </span>
                 </div>
-                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-1.5">
+                <div className="mb-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="h-full bg-spotify-green rounded-full transition-all duration-500"
+                    className="h-full rounded-full bg-spotify-green transition-all duration-500"
                     style={{ width: `${value}%` }}
                   />
                 </div>
-                <p className="text-xs text-spotify-subtext leading-snug">
+                <p className="text-xs leading-snug text-spotify-subtext">
                   {AXIS_META[axis]?.desc}
                 </p>
               </div>

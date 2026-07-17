@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { getRecentlyPlayedHistory, type HistoryItem } from "@/app/(dashboard)/history/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPlayedAt } from "@/lib/utils";
+import { QueryEmptyState, QueryErrorState } from "./QueryState";
 
 function RecentlyPlayedSkeleton() {
   return (
@@ -25,6 +26,13 @@ function RecentlyPlayedSkeleton() {
 export function RecentlyPlayed() {
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  const refetch = useCallback(() => {
+    setIsRetrying(true);
+    setReloadToken((token) => token + 1);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +55,10 @@ export function RecentlyPlayed() {
         setError(
           err instanceof Error ? err.message : "Failed to load listening history."
         );
+      } finally {
+        if (!cancelled) {
+          setIsRetrying(false);
+        }
       }
     }
 
@@ -55,7 +67,7 @@ export function RecentlyPlayed() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadToken]);
 
   if (history === null) {
     return <RecentlyPlayedSkeleton />;
@@ -63,21 +75,22 @@ export function RecentlyPlayed() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">Could not load recent history.</p>
-        <p className="text-spotify-subtext text-xs mt-1">{error}</p>
-      </div>
+      <QueryErrorState
+        title="Could not load recent history."
+        description={error}
+        onRetry={refetch}
+        isRetrying={isRetrying}
+      />
     );
   }
 
   if (history.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">No listening history yet.</p>
-        <p className="text-spotify-subtext text-xs mt-1">
-          Spotify has not returned any recently played tracks yet.
-        </p>
-      </div>
+      <QueryEmptyState
+        title="No listening history yet."
+        description="Play something on Spotify, then refresh to see it here."
+        onRetry={refetch}
+      />
     );
   }
 
@@ -86,13 +99,13 @@ export function RecentlyPlayed() {
       {history.map((item) => (
         <div
           key={`${item.trackSpotifyId}-${item.playedAt}`}
-          className="flex items-center gap-4 p-3 hover:bg-white/5 transition-colors rounded-xl"
+          className="flex items-center gap-4 rounded-xl p-3 transition-colors hover:bg-white/5"
         >
           <a
             href={`https://open.spotify.com/album/${item.albumSpotifyId ?? ""}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={`relative w-10 h-10 rounded overflow-hidden shrink-0 bg-spotify-card${!item.albumSpotifyId ? " pointer-events-none" : ""}`}
+            className={`relative h-10 w-10 shrink-0 overflow-hidden rounded bg-spotify-card${!item.albumSpotifyId ? " pointer-events-none" : ""}`}
           >
             {item.albumImageUrl ? (
               <Image
@@ -103,7 +116,7 @@ export function RecentlyPlayed() {
                 sizes="40px"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="flex h-full w-full items-center justify-center">
                 <span className="text-xs text-spotify-subtext">♪</span>
               </div>
             )}
@@ -113,13 +126,13 @@ export function RecentlyPlayed() {
             href={`https://open.spotify.com/track/${item.trackSpotifyId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 min-w-0 hover:text-spotify-green transition-colors"
+            className="min-w-0 flex-1 transition-colors hover:text-spotify-green"
           >
-            <p className="text-sm font-medium truncate">{item.trackName}</p>
+            <p className="truncate text-sm font-medium">{item.trackName}</p>
           </a>
 
-          <div className="hidden md:flex items-center gap-1 flex-1 min-w-0">
-            <p className="text-xs text-spotify-subtext truncate">
+          <div className="hidden min-w-0 flex-1 items-center gap-1 md:flex">
+            <p className="truncate text-xs text-spotify-subtext">
               {item.artistNames.map((name, idx) => {
                 const artistId = item.artistSpotifyIds[idx];
                 return artistId ? (
@@ -128,7 +141,7 @@ export function RecentlyPlayed() {
                     href={`https://open.spotify.com/artist/${artistId}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-spotify-green transition-colors"
+                    className="transition-colors hover:text-spotify-green"
                   >
                     {name}
                     {idx < item.artistNames.length - 1 ? ", " : ""}
@@ -143,22 +156,22 @@ export function RecentlyPlayed() {
             </p>
           </div>
 
-          <div className="hidden lg:block flex-1 min-w-0">
+          <div className="hidden min-w-0 flex-1 lg:block">
             {item.albumSpotifyId ? (
               <a
                 href={`https://open.spotify.com/album/${item.albumSpotifyId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-spotify-subtext truncate block hover:text-spotify-green transition-colors"
+                className="block truncate text-xs text-spotify-subtext transition-colors hover:text-spotify-green"
               >
                 {item.albumName}
               </a>
             ) : (
-              <p className="text-xs text-spotify-subtext truncate">{item.albumName}</p>
+              <p className="truncate text-xs text-spotify-subtext">{item.albumName}</p>
             )}
           </div>
 
-          <span className="text-xs text-spotify-subtext shrink-0 hidden sm:block">
+          <span className="hidden shrink-0 text-xs text-spotify-subtext sm:block">
             {formatPlayedAt(item.playedAt)}
           </span>
         </div>

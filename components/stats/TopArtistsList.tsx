@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { TimeRange } from "@/types/spotify";
 import { getRankChange } from "./RankChangeBadge";
 import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
+import { QueryEmptyState, QueryErrorState } from "./QueryState";
 
 interface TopArtistsListProps {
   timeRange: TimeRange;
@@ -31,7 +32,8 @@ function TopArtistsListSkeleton() {
 }
 
 export function TopArtistsList({ timeRange }: TopArtistsListProps) {
-  const { data, error, isLoading, isRefreshing } = useSpotifyTopData(timeRange);
+  const { data, error, isLoading, isRefreshing, refetch } =
+    useSpotifyTopData(timeRange);
   const artists = data?.artists ?? [];
 
   if (isLoading || isRefreshing) {
@@ -40,19 +42,22 @@ export function TopArtistsList({ timeRange }: TopArtistsListProps) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">Could not load top artists.</p>
-        <p className="text-spotify-subtext text-xs mt-1">{error}</p>
-      </div>
+      <QueryErrorState
+        title="Could not load top artists."
+        description={error}
+        onRetry={refetch}
+        isRetrying={isRefreshing}
+      />
     );
   }
 
   if (artists.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">No artists found.</p>
-        <p className="text-spotify-subtext text-xs mt-1">Spotify did not return any top artists for this range.</p>
-      </div>
+      <QueryEmptyState
+        title="No artists found."
+        description="Spotify did not return any top artists for this range. Try another time window or listen to more artists."
+        onRetry={refetch}
+      />
     );
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { AlertCircle, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface RecapDownloadButtonProps {
@@ -10,11 +10,13 @@ interface RecapDownloadButtonProps {
 
 export function RecapDownloadButton({ cardRef }: RecapDownloadButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDownload = async () => {
     if (!cardRef.current || isGenerating) return;
 
     setIsGenerating(true);
+    setError(null);
     try {
       const html2canvas = (await import("html2canvas")).default;
       const canvas = await html2canvas(cardRef.current, {
@@ -32,28 +34,45 @@ export function RecapDownloadButton({ cardRef }: RecapDownloadButtonProps) {
       link.click();
     } catch (err) {
       console.error("Failed to generate recap image:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not generate the PNG. Try refreshing and downloading again."
+      );
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <Button
-      onClick={handleDownload}
-      disabled={isGenerating}
-      className="h-11 rounded-xl px-5"
-    >
-      {isGenerating ? (
-        <>
-          <Loader2 className="w-4 h-4 animate-spin" />
-          Generating…
-        </>
-      ) : (
-        <>
-          <Download className="w-4 h-4" />
-          Download PNG
-        </>
-      )}
-    </Button>
+    <div className="flex flex-col items-start gap-2">
+      <Button
+        onClick={handleDownload}
+        disabled={isGenerating}
+        className="h-11 rounded-xl px-5"
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Generating…
+          </>
+        ) : (
+          <>
+            <Download className="h-4 w-4" />
+            Download PNG
+          </>
+        )}
+      </Button>
+      {error ? (
+        <p
+          className="flex max-w-sm items-start gap-1.5 text-xs text-rose-300"
+          role="alert"
+          aria-live="polite"
+        >
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>{error}</span>
+        </p>
+      ) : null}
+    </div>
   );
 }

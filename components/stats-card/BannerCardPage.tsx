@@ -26,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { THEME_SWATCHES } from "@/lib/themes";
 import type { CardThemeKey } from "@/lib/themes";
+import { CardPreviewImage } from "@/components/stats-card/CardPreviewImage";
 
 const BANNER_META = {
   classic: {
@@ -256,16 +257,13 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
             </CardHeader>
             <CardContent>
               {cardUrl ? (
-                <div className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    key={`${cardUrl}-${previewKey}`}
-                    src={cardUrl}
-                    alt="Stats card preview"
-                    className="w-full"
-                    style={{ aspectRatio: meta.aspect }}
-                  />
-                </div>
+                <CardPreviewImage
+                  src={cardUrl}
+                  alt="Stats card preview"
+                  aspectRatio={meta.aspect}
+                  previewKey={previewKey}
+                  onRetry={() => setPreviewKey((key) => key + 1)}
+                />
               ) : (
                 <Skeleton
                   className="w-full rounded-xl"

@@ -15,6 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TimeRange } from "@/types/spotify";
 import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
+import { QueryEmptyState, QueryErrorState } from "./QueryState";
 
 interface GenreBreakdownProps {
   timeRange: TimeRange;
@@ -113,15 +114,18 @@ function GenreBreakdownSkeleton({ view }: { view: GenreChartView }) {
 
 export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
   const [view, setView] = useState<GenreChartView>("ranking");
-  const { data, error, isLoading, isRefreshing } = useSpotifyTopData(timeRange);
+  const { data, error, isLoading, isRefreshing, refetch } =
+    useSpotifyTopData(timeRange);
   const genres = data?.genres ?? [];
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">Could not load genre data.</p>
-        <p className="text-spotify-subtext text-xs mt-1">{error}</p>
-      </div>
+      <QueryErrorState
+        title="Could not load genre data."
+        description={error}
+        onRetry={refetch}
+        isRetrying={isRefreshing}
+      />
     );
   }
 
@@ -173,9 +177,11 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
 
   if (genres.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">No genre data available.</p>
-      </div>
+      <QueryEmptyState
+        title="No genre data available."
+        description="We need more top-artist genre tags from Spotify to build this chart."
+        onRetry={refetch}
+      />
     );
   }
 
