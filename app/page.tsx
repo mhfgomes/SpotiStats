@@ -25,17 +25,19 @@ export default function HomePage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap');
-        .ss { font-family: 'Figtree', sans-serif; }
         @keyframes ss-up { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
         .ss-u1 { animation: ss-up .6s ease both .05s; opacity:0; }
         .ss-u2 { animation: ss-up .6s ease both .18s; opacity:0; }
         .ss-u3 { animation: ss-up .6s ease both .32s; opacity:0; }
         .ss-card { transition: border-color .2s ease, transform .2s ease; }
         .ss-card:hover { border-color: rgba(29,185,84,.3) !important; transform: translateY(-3px); }
+        @media (prefers-reduced-motion: reduce) {
+          .ss-u1, .ss-u2, .ss-u3 { animation: none; opacity: 1; }
+          .ss-card:hover { transform: none; }
+        }
       `}</style>
 
-      <main className="ss bg-[#121212] text-white min-h-screen">
+      <main className="min-h-screen bg-[#121212] text-white">
 
         {/* NAV */}
         <nav className="flex items-center justify-between px-6 md:px-10 py-5">

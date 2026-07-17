@@ -187,7 +187,7 @@ export function RecapCard({ cardRef, themeKey = "ocean" }: RecapCardProps) {
                 flexShrink: 0,
               }}
             >
-              🎤
+              ♪
             </div>
           )}
           <div>
