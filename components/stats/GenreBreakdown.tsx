@@ -116,11 +116,11 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
   const { data, error, isLoading, isRefreshing } = useSpotifyTopData(timeRange);
   const genres = data?.genres ?? [];
 
-  if (error) {
+  if (error && !data) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">Could not load genre data.</p>
-        <p className="text-spotify-subtext text-xs mt-1">{error}</p>
+        <p className="text-sm text-spotify-subtext">Could not load genre data.</p>
+        <p className="mt-1 text-xs text-spotify-subtext">{error}</p>
       </div>
     );
   }
@@ -171,10 +171,10 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
     );
   }
 
-  if (genres.length === 0) {
+  if (genres.length === 0 && !isRefreshing) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-spotify-subtext text-sm">No genre data available.</p>
+        <p className="text-sm text-spotify-subtext">No genre data available.</p>
       </div>
     );
   }
@@ -227,8 +227,10 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
         </div>
       </div>
 
-      {isLoading || isRefreshing ? (
-        <GenreBreakdownSkeleton view={view} />
+      {isRefreshing ? (
+        <div className="pointer-events-none opacity-55 transition-opacity duration-200" aria-busy="true">
+          <GenreBreakdownSkeleton view={view} />
+        </div>
       ) : view === "ranking" ? (
         <div className="min-w-0 h-[400px]">
           <ResponsiveContainer width="100%" height="100%">

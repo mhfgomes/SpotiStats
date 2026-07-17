@@ -1,24 +1,39 @@
 "use client";
 
 import { TasteRadar } from "@/components/stats/TasteRadar";
+import { TimeRangeTabs } from "@/components/stats/TimeRangeTabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
+import { timeRangeLabel, useTimeRange } from "@/hooks/useTimeRange";
+import { cn } from "@/lib/utils";
 
 const AXIS_META: Record<string, { desc: string }> = {
-  Energy:       { desc: "Electronic, dance, hip-hop, metal — high-tempo and high-intensity music" },
-  Acoustic:     { desc: "Folk, singer-songwriter, classical — organic and unplugged sounds" },
-  Mood:         { desc: "Jazz, soul, R&B, lo-fi — emotionally rich and introspective listening" },
-  Experimental: { desc: "Avant-garde, psychedelic, post-rock — unconventional and boundary-pushing" },
-  Mainstream:   { desc: "Pop, dance pop, chart hits — widely popular and commercially produced" },
-  Underground:  { desc: "Indie, alternative, shoegaze — niche genres and DIY scenes" },
+  Energy: {
+    desc: "Electronic, dance, hip-hop, metal — high-tempo and high-intensity music",
+  },
+  Acoustic: {
+    desc: "Folk, singer-songwriter, classical — organic and unplugged sounds",
+  },
+  Mood: {
+    desc: "Jazz, soul, R&B, lo-fi — emotionally rich and introspective listening",
+  },
+  Experimental: {
+    desc: "Avant-garde, psychedelic, post-rock — unconventional and boundary-pushing",
+  },
+  Mainstream: {
+    desc: "Pop, dance pop, chart hits — widely popular and commercially produced",
+  },
+  Underground: {
+    desc: "Indie, alternative, shoegaze — niche genres and DIY scenes",
+  },
 };
 
 const AXIS_ORDER = Object.keys(AXIS_META);
 
 function TasteProfileSkeleton() {
   return (
-    <div className="spotify-card p-6 flex flex-col lg:flex-row gap-6">
-      <div className="lg:w-1/2 shrink-0">
+    <div className="spotify-card flex flex-col gap-6 p-6 lg:flex-row">
+      <div className="shrink-0 lg:w-1/2">
         <div className="relative h-[340px] w-full overflow-hidden rounded-xl border border-white/5 bg-white/[0.02]">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative size-60 rounded-full border border-white/10">
@@ -38,10 +53,10 @@ function TasteProfileSkeleton() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center gap-4">
+      <div className="flex flex-1 flex-col justify-center gap-4">
         {AXIS_ORDER.map((axis, index) => (
           <div key={axis}>
-            <div className="flex items-center justify-between mb-1">
+            <div className="mb-1 flex items-center justify-between">
               <Skeleton className="h-4 w-24 rounded-full" />
               <Skeleton className="h-4 w-12 rounded-full" />
             </div>
@@ -59,54 +74,65 @@ function TasteProfileSkeleton() {
 }
 
 export default function TasteProfilePage() {
-  const { data, error, isLoading } = useSpotifyTopData("short_term");
+  const { timeRange, setTimeRange, isPending } = useTimeRange();
+  const { data, error, isLoading, isRefreshing } = useSpotifyTopData(timeRange);
   const profile = data?.tasteProfile ?? [];
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <p className="text-spotify-subtext text-sm">
-          Based on your top artists&apos; genres over the past 4 weeks
+    <div className="mx-auto max-w-4xl">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-spotify-subtext">
+          Based on your top artists&apos; genres over the {timeRangeLabel(timeRange)}
         </p>
+        <TimeRangeTabs
+          value={timeRange}
+          onChange={setTimeRange}
+          isPending={isPending || isRefreshing}
+        />
       </div>
 
-      {isLoading ? (
+      {isLoading && !data ? (
         <TasteProfileSkeleton />
-      ) : error ? (
-        <div className="spotify-card p-6 flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-spotify-subtext text-sm">Could not load taste profile.</p>
-          <p className="text-spotify-subtext text-xs mt-1">{error}</p>
+      ) : error && !data ? (
+        <div className="spotify-card flex flex-col items-center justify-center p-6 py-16 text-center">
+          <p className="text-sm text-spotify-subtext">Could not load taste profile.</p>
+          <p className="mt-1 text-xs text-spotify-subtext">{error}</p>
         </div>
       ) : profile.length === 0 ? (
-        <div className="spotify-card p-6 flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-spotify-subtext text-sm">No taste profile data yet.</p>
-          <p className="text-spotify-subtext text-xs mt-1">
+        <div className="spotify-card flex flex-col items-center justify-center p-6 py-16 text-center">
+          <p className="text-sm text-spotify-subtext">No taste profile data yet.</p>
+          <p className="mt-1 text-xs text-spotify-subtext">
             Spotify did not return enough artist genre data yet.
           </p>
         </div>
       ) : (
-        <div className="spotify-card p-6 flex flex-col lg:flex-row gap-6">
-
-          {/* Radar chart */}
-          <div className="lg:w-1/2 shrink-0">
+        <div
+          className={cn(
+            "spotify-card flex flex-col gap-6 p-6 transition-opacity duration-200 lg:flex-row",
+            isRefreshing && "pointer-events-none opacity-55"
+          )}
+          aria-busy={isRefreshing}
+        >
+          <div className="shrink-0 lg:w-1/2">
             <TasteRadar profile={profile} />
           </div>
 
-          {/* Axis breakdown */}
-          <div className="flex-1 flex flex-col justify-center gap-4">
+          <div className="flex flex-1 flex-col justify-center gap-4">
             {profile.map(({ axis, value }) => (
               <div key={axis}>
-                <div className="flex items-center justify-between mb-1">
+                <div className="mb-1 flex items-center justify-between">
                   <span className="text-sm font-semibold text-white">{axis}</span>
-                  <span className="text-sm font-bold text-spotify-green tabular-nums">{value}%</span>
+                  <span className="text-sm font-bold tabular-nums text-spotify-green">
+                    {value}%
+                  </span>
                 </div>
-                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-1.5">
+                <div className="mb-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="h-full bg-spotify-green rounded-full transition-all duration-500"
+                    className="h-full rounded-full bg-spotify-green transition-all duration-500"
                     style={{ width: `${value}%` }}
                   />
                 </div>
-                <p className="text-xs text-spotify-subtext leading-snug">
+                <p className="text-xs leading-snug text-spotify-subtext">
                   {AXIS_META[axis]?.desc}
                 </p>
               </div>
