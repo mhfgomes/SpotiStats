@@ -17,7 +17,7 @@ export default function HistoryPage() {
           <span className="flex-1 min-w-0">Track</span>
           <span className="hidden md:flex flex-1 min-w-0">Artist</span>
           <span className="hidden lg:flex flex-1 min-w-0">Album</span>
-          <span className="hidden sm:block shrink-0">Played at</span>
+          <span className="shrink-0">Played at</span>
         </div>
         <RecentlyPlayed />
       </div>

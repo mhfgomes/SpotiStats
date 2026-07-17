@@ -73,8 +73,8 @@ export function ArtistCard({
       </div>
 
       {/* Genres column */}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-spotify-subtext truncate">
+      <div className="hidden min-w-0 flex-1 sm:block">
+        <p className="truncate text-xs text-spotify-subtext">
           {genres.slice(0, 3).join(" · ") || "No genres listed"}
         </p>
       </div>

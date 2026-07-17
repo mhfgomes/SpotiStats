@@ -79,7 +79,7 @@ export default function TopArtistsPage() {
             <span className="w-6 shrink-0 text-right">#</span>
             <span className="w-12 shrink-0" />
             <span className="flex-1">Artist</span>
-            <span className="flex-1">Genres</span>
+            <span className="hidden flex-1 sm:block">Genres</span>
             <span className="w-5" />
           </div>
         </div>

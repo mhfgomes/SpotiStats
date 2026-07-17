@@ -158,7 +158,7 @@ export function RecentlyPlayed() {
             )}
           </div>
 
-          <span className="text-xs text-spotify-subtext shrink-0 hidden sm:block">
+          <span className="shrink-0 text-[11px] text-spotify-subtext sm:text-xs">
             {formatPlayedAt(item.playedAt)}
           </span>
         </div>
