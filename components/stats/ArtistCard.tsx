@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Mic2 } from "lucide-react";
 import {
   RankChangeBadge,
   type RankChange,
@@ -54,8 +54,8 @@ export function ArtistCard({
             sizes="48px"
           />
         ) : (
-          <div className="w-full h-full rounded-full bg-spotify-card flex items-center justify-center">
-            <span className="text-lg">🎤</span>
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-spotify-card">
+            <Mic2 className="h-5 w-5 text-spotify-subtext" aria-hidden="true" />
           </div>
         )}
       </a>

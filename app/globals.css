@@ -33,7 +33,7 @@
   body {
     background-color: #121212;
     color: #ffffff;
-    font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: var(--font-figtree), "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
 
   ::-webkit-scrollbar {
@@ -55,14 +55,17 @@
 @layer components {
   .spotify-card {
     background-color: #282828;
-    border: 1px solid rgb(255 255 255 / 0.05);
-    border-radius: 0.75rem;
-    box-shadow: 0 0 20px rgb(29 185 84 / 0.15);
-    transition: box-shadow 300ms;
+    border: 1px solid rgb(255 255 255 / 0.06);
+    border-radius: 1rem;
+    box-shadow: 0 12px 40px -24px rgb(29 185 84 / 0.28);
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
   }
 
   .spotify-card:hover {
-    box-shadow: 0 0 30px rgb(29 185 84 / 0.25);
+    border-color: rgb(255 255 255 / 0.1);
+    box-shadow: 0 16px 48px -24px rgb(29 185 84 / 0.35);
   }
 
   .green-accent {

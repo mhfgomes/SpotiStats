@@ -65,8 +65,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        "card-glow": "0 0 20px rgba(29,185,84,0.15)",
-        "card-glow-hover": "0 0 30px rgba(29,185,84,0.25)",
+        "card-glow": "0 12px 40px -24px rgba(29,185,84,0.28)",
+        "card-glow-hover": "0 16px 48px -24px rgba(29,185,84,0.35)",
       },
       keyframes: {
         "accordion-down": {
