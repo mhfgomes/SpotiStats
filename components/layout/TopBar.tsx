@@ -20,13 +20,12 @@ const PAGE_TITLES: Record<string, string> = {
   "/top-genres": "Top Genres",
   "/history": "Listening History",
   "/taste-profile": "Taste Profile",
-  "/recap": "Year in Music",
-  "/stats-card/classic":     "Classic Card",
-  "/stats-card/tracks":      "Tracks Card",
-  "/stats-card/artists":     "Artists Card",
-  "/stats-card/compact":     "Compact Card",
+  "/stats-card/classic": "Classic Card",
+  "/stats-card/tracks": "Tracks Card",
+  "/stats-card/artists": "Artists Card",
+  "/stats-card/compact": "Compact Card",
   "/stats-card/now-playing": "Now Playing Banner",
-  "/stats-card/recap":       "Recap Card",
+  "/stats-card/recap": "Recap Card",
 };
 
 export function TopBar() {
