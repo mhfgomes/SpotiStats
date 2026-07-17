@@ -15,6 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TimeRange } from "@/types/spotify";
 import { useSpotifyTopData } from "@/hooks/useSpotifyTopData";
+import { cn } from "@/lib/utils";
 
 interface GenreBreakdownProps {
   timeRange: TimeRange;
@@ -227,88 +228,95 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
         </div>
       </div>
 
-      {isRefreshing ? (
-        <div className="pointer-events-none opacity-55 transition-opacity duration-200" aria-busy="true">
-          <GenreBreakdownSkeleton view={view} />
-        </div>
-      ) : view === "ranking" ? (
-        <div className="min-w-0 h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 0, right: 24, left: 0, bottom: 0 }}
-            >
-              <XAxis
-                type="number"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#B3B3B3", fontSize: 11 }}
-              />
-              <YAxis
-                dataKey="genre"
-                type="category"
-                width={140}
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#fff", fontSize: 12 }}
-              />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                {chartData.map((entry) => (
-                  <Cell key={entry.genre} fill={entry.fill} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_180px]">
-          <div className="min-w-0 h-[320px]">
+      <div
+        className={cn(
+          "transition-opacity duration-200",
+          isRefreshing && "pointer-events-none opacity-55"
+        )}
+        aria-busy={isRefreshing}
+      >
+        {view === "ranking" ? (
+          <div className="h-[400px] min-w-0">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartData.slice(0, 8)}
-                  dataKey="count"
-                  nameKey="genre"
-                  innerRadius={68}
-                  outerRadius={108}
-                  paddingAngle={2}
-                  stroke="rgba(18,18,18,0.9)"
-                  strokeWidth={2}
-                >
-                  {chartData.slice(0, 8).map((entry) => (
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{ top: 0, right: 24, left: 0, bottom: 0 }}
+              >
+                <XAxis
+                  type="number"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#B3B3B3", fontSize: 11 }}
+                />
+                <YAxis
+                  dataKey="genre"
+                  type="category"
+                  width={140}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#fff", fontSize: 12 }}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                />
+                <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                  {chartData.map((entry) => (
                     <Cell key={entry.genre} fill={entry.fill} />
                   ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
+                </Bar>
+              </BarChart>
             </ResponsiveContainer>
           </div>
+        ) : (
+          <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_180px]">
+            <div className="h-[320px] min-w-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData.slice(0, 8)}
+                    dataKey="count"
+                    nameKey="genre"
+                    innerRadius={68}
+                    outerRadius={108}
+                    paddingAngle={2}
+                    stroke="rgba(18,18,18,0.9)"
+                    strokeWidth={2}
+                  >
+                    {chartData.slice(0, 8).map((entry) => (
+                      <Cell key={entry.genre} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
 
-          <div className="space-y-2">
-            {chartData.slice(0, 8).map((genre) => (
-              <div
-                key={genre.genre}
-                className="flex items-center justify-between gap-3 rounded-xl border border-white/6 bg-black/10 px-3 py-2"
-              >
-                <div className="flex min-w-0 items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: genre.fill }}
-                  />
-                  <span className="truncate text-xs text-white/90">
-                    {genre.genre}
+            <div className="space-y-2">
+              {chartData.slice(0, 8).map((genre) => (
+                <div
+                  key={genre.genre}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-white/6 bg-black/10 px-3 py-2"
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: genre.fill }}
+                    />
+                    <span className="truncate text-xs text-white/90">
+                      {genre.genre}
+                    </span>
+                  </div>
+                  <span className="shrink-0 text-xs font-medium text-spotify-subtext">
+                    {genre.share.toFixed(1)}%
                   </span>
                 </div>
-                <span className="shrink-0 text-xs font-medium text-spotify-subtext">
-                  {genre.share.toFixed(1)}%
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
