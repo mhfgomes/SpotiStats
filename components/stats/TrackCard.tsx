@@ -86,7 +86,11 @@ export function TrackCard({
             {trackName}
           </a>
           {explicit && (
-            <span className="text-[10px] bg-spotify-subtext/30 text-spotify-subtext px-1 py-0.5 rounded font-medium shrink-0">
+            <span
+              className="shrink-0 rounded bg-spotify-subtext/30 px-1 py-0.5 text-[10px] font-medium text-spotify-subtext"
+              aria-label="Explicit"
+              title="Explicit"
+            >
               E
             </span>
           )}
@@ -143,14 +147,15 @@ export function TrackCard({
       </span>
 
       {/* Link */}
-      <div className="w-5 shrink-0 flex items-center justify-center">
+      <div className="flex w-5 shrink-0 items-center justify-center">
         <a
           href={externalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-spotify-subtext hover:text-spotify-green"
+          aria-label={`Open ${trackName} on Spotify`}
+          className="text-spotify-subtext opacity-100 transition-opacity hover:text-spotify-green focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
         >
-          <ExternalLink className="w-3.5 h-3.5" />
+          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
         </a>
       </div>
     </div>

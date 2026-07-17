@@ -27,7 +27,7 @@ export function RecapDownloadButton({ cardRef }: RecapDownloadButtonProps) {
 
       const url = canvas.toDataURL("image/png");
       const link = document.createElement("a");
-      link.download = `spotistats-recap-${new Date().getFullYear()}.png`;
+      link.download = `spotistats-recap-4-weeks.png`;
       link.href = url;
       link.click();
     } catch (err) {

@@ -15,7 +15,7 @@ const features = [
   { icon: Radio,     title: "Genre Breakdown",     description: "A radar chart that reveals your musical DNA — how much pop, indie, electronic, and more you actually stream." },
   { icon: Clock,     title: "Listening History",   description: "A full timeline of your recently played tracks with smart deduplication and timestamps." },
   { icon: Layers,    title: "Taste Profile",       description: "Your musical personality across 6 dimensions: energy, danceability, acousticness, valence, and more." },
-  { icon: Download,  title: "Recap Card",          description: "A beautiful shareable image of your year in music. Download it as PNG and show off your taste." },
+  { icon: Download,  title: "Recap Card",          description: "A beautiful shareable image of your last 4 weeks in music. Download it as PNG and show off your taste." },
 ];
 
 export default function HomePage() {

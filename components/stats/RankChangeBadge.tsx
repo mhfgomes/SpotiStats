@@ -33,6 +33,26 @@ export function getRankChange(
   return null;
 }
 
+function accessibleLabel(
+  change: RankChange,
+  comparisonSnapshotSyncedAt?: number | null
+) {
+  const since = comparisonSnapshotSyncedAt
+    ? ` since ${formatComparisonSnapshotDate(comparisonSnapshotSyncedAt)}`
+    : "";
+
+  switch (change.direction) {
+    case "new":
+      return `New entry${since}`;
+    case "same":
+      return `No rank change${since}`;
+    case "up":
+      return `Up ${change.delta} places${since}`;
+    case "down":
+      return `Down ${change.delta} places${since}`;
+  }
+}
+
 export function RankChangeBadge({
   change,
   comparisonSnapshotSyncedAt,
@@ -46,15 +66,7 @@ export function RankChangeBadge({
 
   const baseClassName =
     "inline-flex h-7 min-w-7 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-semibold leading-none tabular-nums";
-  const tooltipLabel = comparisonSnapshotSyncedAt
-    ? formatComparisonSnapshotDate(comparisonSnapshotSyncedAt)
-    : change.direction === "new"
-      ? "New since previous snapshot"
-      : change.direction === "same"
-        ? "No change"
-        : change.direction === "up"
-          ? `Up ${change.delta}`
-          : `Down ${change.delta}`;
+  const label = accessibleLabel(change, comparisonSnapshotSyncedAt);
 
   if (change.direction === "new") {
     return (
@@ -64,9 +76,10 @@ export function RankChangeBadge({
           "border-amber-400/30 bg-amber-400/12 text-amber-200",
           className
         )}
-        title={tooltipLabel}
+        title={label}
+        aria-label={label}
       >
-        <Sparkles className="h-3.5 w-3.5" />
+        <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
       </span>
     );
   }
@@ -79,9 +92,10 @@ export function RankChangeBadge({
           "border-white/12 bg-white/6 text-spotify-subtext",
           className
         )}
-        title={tooltipLabel}
+        title={label}
+        aria-label={label}
       >
-        <Dot className="h-4 w-4" />
+        <Dot className="h-4 w-4" aria-hidden="true" />
       </span>
     );
   }
@@ -94,10 +108,11 @@ export function RankChangeBadge({
           "border-emerald-400/30 bg-emerald-400/12 text-emerald-200",
           className
         )}
-        title={tooltipLabel}
+        title={label}
+        aria-label={label}
       >
-        <ArrowUp className="h-3.5 w-3.5" />
-        <span>{change.delta}</span>
+        <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
+        <span aria-hidden="true">{change.delta}</span>
       </span>
     );
   }
@@ -109,10 +124,11 @@ export function RankChangeBadge({
         "border-rose-400/30 bg-rose-400/12 text-rose-200",
         className
       )}
-      title={tooltipLabel}
+      title={label}
+      aria-label={label}
     >
-      <ArrowDown className="h-3.5 w-3.5" />
-      <span>{change.delta}</span>
+      <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
+      <span aria-hidden="true">{change.delta}</span>
     </span>
   );
 }

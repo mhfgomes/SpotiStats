@@ -127,7 +127,7 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
 
   if (isLoading && !data) {
     return (
-      <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4 sm:p-5">
+      <div className="spotify-card p-4 sm:p-5">
         <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-sm font-medium">
@@ -140,30 +140,38 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
             </p>
           </div>
 
-          <div className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1">
-            <button
-              type="button"
-              onClick={() => setView("ranking")}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                view === "ranking"
-                  ? "bg-white text-black"
-                  : "text-spotify-subtext hover:text-white"
-              }`}
-            >
-              Ranking
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("share")}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                view === "share"
-                  ? "bg-white text-black"
-                  : "text-spotify-subtext hover:text-white"
-              }`}
-            >
-              Share
-            </button>
-          </div>
+        <div
+          className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1"
+          role="radiogroup"
+          aria-label="Genre chart view"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={view === "ranking"}
+            onClick={() => setView("ranking")}
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green ${
+              view === "ranking"
+                ? "bg-white text-black"
+                : "text-spotify-subtext hover:text-white"
+            }`}
+          >
+            Ranking
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={view === "share"}
+            onClick={() => setView("share")}
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green ${
+              view === "share"
+                ? "bg-white text-black"
+                : "text-spotify-subtext hover:text-white"
+            }`}
+          >
+            Share
+          </button>
+        </div>
         </div>
 
         <GenreBreakdownSkeleton view={view} />
@@ -188,7 +196,7 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
   }));
 
   return (
-    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4 sm:p-5">
+    <div className="spotify-card p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-medium">
@@ -201,11 +209,17 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
           </p>
         </div>
 
-        <div className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1">
+        <div
+          className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1"
+          role="radiogroup"
+          aria-label="Genre chart view"
+        >
           <button
             type="button"
+            role="radio"
+            aria-checked={view === "ranking"}
             onClick={() => setView("ranking")}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green ${
               view === "ranking"
                 ? "bg-white text-black"
                 : "text-spotify-subtext hover:text-white"
@@ -215,8 +229,10 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
           </button>
           <button
             type="button"
+            role="radio"
+            aria-checked={view === "share"}
             onClick={() => setView("share")}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green ${
               view === "share"
                 ? "bg-white text-black"
                 : "text-spotify-subtext hover:text-white"

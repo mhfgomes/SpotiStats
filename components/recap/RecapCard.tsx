@@ -25,7 +25,8 @@ export function RecapCard({ cardRef, themeKey = "ocean" }: RecapCardProps) {
   const top5Tracks = data?.tracks.slice(0, 5) ?? [];
   const topArtist = data?.artists[0];
   const topGenre = data?.genres[0]?.genre ?? "—";
-  const year = new Date().getFullYear();
+  // Recap is based on Spotify short_term (approx. last 4 weeks)
+  const periodLabel = "Last 4 weeks";
 
   const cardBase: React.CSSProperties = {
     width: 400,
@@ -133,7 +134,7 @@ export function RecapCard({ cardRef, themeKey = "ocean" }: RecapCardProps) {
             SpotiStats
           </div>
           <div style={{ fontSize: 11, color: theme.sub }}>
-            {user?.displayName ?? "Your"} &bull; {year} Recap
+            {user?.displayName ?? "Your"} &bull; {periodLabel}
           </div>
         </div>
       </div>

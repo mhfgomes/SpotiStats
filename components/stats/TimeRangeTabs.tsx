@@ -21,27 +21,37 @@ export function TimeRangeTabs({
   isPending = false,
 }: TimeRangeTabsProps) {
   return (
-    <div className="flex items-center gap-1 rounded-full bg-white/5 p-1 w-fit">
-      {RANGES.map((range) => (
-        <button
-          key={range.value}
-          onClick={() => onChange(range.value)}
-          disabled={isPending}
-          className={cn(
-            "relative px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-wait",
-            value === range.value
-              ? "bg-spotify-green text-black"
-              : "text-spotify-subtext hover:text-white"
-          )}
-        >
-          <span className={cn("transition-opacity", isPending && "opacity-70")}>
-            {range.label}
-          </span>
-          {isPending && value === range.value ? (
-            <span className="absolute inset-x-3 bottom-1 h-px animate-pulse bg-black/60" />
-          ) : null}
-        </button>
-      ))}
+    <div
+      role="radiogroup"
+      aria-label="Time range"
+      className="flex w-fit items-center gap-1 rounded-full bg-white/5 p-1"
+    >
+      {RANGES.map((range) => {
+        const selected = value === range.value;
+        return (
+          <button
+            key={range.value}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            onClick={() => onChange(range.value)}
+            disabled={isPending}
+            className={cn(
+              "relative rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green focus-visible:ring-offset-2 focus-visible:ring-offset-spotify-black disabled:cursor-wait",
+              selected
+                ? "bg-spotify-green text-black"
+                : "text-spotify-subtext hover:text-white"
+            )}
+          >
+            <span className={cn("transition-opacity", isPending && "opacity-70")}>
+              {range.label}
+            </span>
+            {isPending && selected ? (
+              <span className="absolute inset-x-3 bottom-1 h-px animate-pulse bg-black/60" />
+            ) : null}
+          </button>
+        );
+      })}
     </div>
   );
 }
