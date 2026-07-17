@@ -26,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { THEME_SWATCHES } from "@/lib/themes";
 import type { CardThemeKey } from "@/lib/themes";
+import { CardPreviewImage } from "@/components/stats-card/CardPreviewImage";
 
 export function NowPlayingCardPage() {
   const user = useQuery(api.users.getSpotifyUser);
@@ -175,16 +176,13 @@ export function NowPlayingCardPage() {
             </CardHeader>
             <CardContent>
               {nowPlayingUrl ? (
-                <div className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    key={`${nowPlayingUrl}-${previewKey}`}
-                    src={nowPlayingUrl}
-                    alt="Now playing preview"
-                    className="w-full"
-                    style={{ aspectRatio: "800/200" }}
-                  />
-                </div>
+                <CardPreviewImage
+                  src={nowPlayingUrl}
+                  alt="Now playing preview"
+                  aspectRatio="800/200"
+                  previewKey={previewKey}
+                  onRetry={() => setPreviewKey((key) => key + 1)}
+                />
               ) : (
                 <Skeleton
                   className="w-full rounded-xl"
