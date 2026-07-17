@@ -49,14 +49,15 @@ export function AppSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Main">
         {mainNavItems.map(({ href, icon: Icon, label }) => (
           <Link
             key={href}
             href={href}
             className={cn("sidebar-link", pathname === href && "active")}
+            aria-current={pathname === href ? "page" : undefined}
           >
-            <Icon className="w-4 h-4 shrink-0" />
+            <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span className="text-sm font-medium">{label}</span>
           </Link>
         ))}
@@ -65,28 +66,27 @@ export function AppSidebar() {
         <div className="pt-2">
           <div
             className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium",
-              isStatsCard
-                ? "text-white"
-                : "text-spotify-subtext"
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
+              isStatsCard ? "text-white" : "text-spotify-subtext"
             )}
           >
-            <ImageIcon className="w-4 h-4 shrink-0" />
+            <ImageIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span>Stats Card</span>
           </div>
-          <div className="ml-3 pl-3 border-l border-white/10 space-y-0.5 mt-0.5">
+          <div className="ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
             {statsCardItems.map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green",
                   pathname === href
                     ? "bg-white/10 text-white"
-                    : "text-spotify-subtext hover:text-white hover:bg-white/5"
+                    : "text-spotify-subtext hover:bg-white/5 hover:text-white"
                 )}
+                aria-current={pathname === href ? "page" : undefined}
               >
-                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 <span>{label}</span>
               </Link>
             ))}
