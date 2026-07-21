@@ -20,10 +20,6 @@ export default function NotFound() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap');
-
-        .nf { font-family: 'Figtree', sans-serif; }
-
         /* ── Vinyl spin ── */
         @keyframes vinyl-spin {
           to { transform: rotate(360deg); }
@@ -112,7 +108,7 @@ export default function NotFound() {
         }
       `}</style>
 
-      <main className="nf bg-[#121212] text-white min-h-screen flex flex-col items-center justify-center relative overflow-hidden select-none px-6">
+      <main className="bg-[#121212] text-white min-h-screen flex flex-col items-center justify-center relative overflow-hidden select-none px-6">
 
         {/* ── Background radial glow ── */}
         <div
@@ -214,7 +210,6 @@ export default function NotFound() {
                 textAnchor="middle"
                 fill="#1DB954"
                 fontSize="6.5"
-                fontFamily="Figtree, sans-serif"
                 fontWeight="700"
                 letterSpacing="2"
               >
@@ -225,7 +220,6 @@ export default function NotFound() {
                 textAnchor="middle"
                 fill="rgba(255,255,255,.45)"
                 fontSize="5.5"
-                fontFamily="Figtree, sans-serif"
               >
                 NOT FOUND
               </text>
