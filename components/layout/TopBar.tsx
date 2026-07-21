@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { ChevronDown, LogOut, User } from "lucide-react";
+import { ChevronDown, LogOut, Menu, User } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth-client";
 import {
   DropdownMenu,
@@ -29,14 +29,28 @@ const PAGE_TITLES: Record<string, string> = {
   "/stats-card/recap":       "Recap Card",
 };
 
-export function TopBar() {
+interface TopBarProps {
+  onMenuClick: () => void;
+}
+
+export function TopBar({ onMenuClick }: TopBarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const title = PAGE_TITLES[pathname] ?? "SpotiStats";
 
   return (
-    <header className="sticky top-0 z-20 flex h-[73px] items-center justify-between border-b border-white/5 bg-spotify-black/80 px-6 backdrop-blur">
-      <h1 className="text-lg font-bold">{title}</h1>
+    <header className="sticky top-0 z-20 flex h-[73px] items-center justify-between gap-3 border-b border-white/5 bg-spotify-black/80 px-4 backdrop-blur sm:px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          aria-label="Open navigation menu"
+          className="rounded-lg p-2 text-spotify-subtext transition-colors hover:bg-white/10 hover:text-white lg:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <h1 className="truncate text-lg font-bold">{title}</h1>
+      </div>
       {session?.user ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -56,13 +70,13 @@ export function TopBar() {
                   </span>
                 </div>
               )}
-              <div className="min-w-0">
+              <div className="hidden min-w-0 sm:block">
                 <p className="truncate text-sm font-medium">{session.user.name}</p>
                 <p className="truncate text-[11px] text-spotify-subtext">
                   {session.user.email}
                 </p>
               </div>
-              <ChevronDown className="h-4 w-4 shrink-0 text-spotify-subtext" />
+              <ChevronDown className="hidden h-4 w-4 shrink-0 text-spotify-subtext sm:block" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">

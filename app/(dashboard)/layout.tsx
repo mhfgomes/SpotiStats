@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { useAction, useQuery } from "convex/react";
@@ -15,6 +15,8 @@ export default function DashboardLayout({
 }) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
   const spotifyUser = useQuery(api.users.getSpotifyUser);
   const initUserSync = useAction(api.users.initUserSync);
   const syncTriggered = useRef(false);
@@ -49,10 +51,10 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen">
-      <AppSidebar />
-      <div className="flex-1 ml-60 flex flex-col min-h-screen">
-        <TopBar />
-        <main className="flex-1 p-6">{children}</main>
+      <AppSidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
+        <TopBar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
