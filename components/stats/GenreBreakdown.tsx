@@ -140,10 +140,15 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
             </p>
           </div>
 
-          <div className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1">
+          <div
+            role="group"
+            aria-label="Chart view"
+            className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1"
+          >
             <button
               type="button"
               onClick={() => setView("ranking")}
+              aria-pressed={view === "ranking"}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                 view === "ranking"
                   ? "bg-white text-black"
@@ -155,6 +160,7 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
             <button
               type="button"
               onClick={() => setView("share")}
+              aria-pressed={view === "share"}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                 view === "share"
                   ? "bg-white text-black"
@@ -201,10 +207,15 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
           </p>
         </div>
 
-        <div className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1">
+        <div
+          role="group"
+          aria-label="Chart view"
+          className="inline-flex w-fit rounded-full border border-white/10 bg-black/20 p-1"
+        >
           <button
             type="button"
             onClick={() => setView("ranking")}
+            aria-pressed={view === "ranking"}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
               view === "ranking"
                 ? "bg-white text-black"
@@ -216,6 +227,7 @@ export function GenreBreakdown({ timeRange }: GenreBreakdownProps) {
           <button
             type="button"
             onClick={() => setView("share")}
+            aria-pressed={view === "share"}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
               view === "share"
                 ? "bg-white text-black"

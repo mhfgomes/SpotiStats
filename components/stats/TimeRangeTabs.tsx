@@ -21,12 +21,18 @@ export function TimeRangeTabs({
   isPending = false,
 }: TimeRangeTabsProps) {
   return (
-    <div className="flex items-center gap-1 rounded-full bg-white/5 p-1 w-fit">
+    <div
+      role="group"
+      aria-label="Time range"
+      className="flex items-center gap-1 rounded-full bg-white/5 p-1 w-fit"
+    >
       {RANGES.map((range) => (
         <button
           key={range.value}
+          type="button"
           onClick={() => onChange(range.value)}
           disabled={isPending}
+          aria-pressed={value === range.value}
           className={cn(
             "relative px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-wait",
             value === range.value

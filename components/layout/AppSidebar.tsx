@@ -49,11 +49,12 @@ export function AppSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav aria-label="Main navigation" className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {mainNavItems.map(({ href, icon: Icon, label }) => (
           <Link
             key={href}
             href={href}
+            aria-current={pathname === href ? "page" : undefined}
             className={cn("sidebar-link", pathname === href && "active")}
           >
             <Icon className="w-4 h-4 shrink-0" />
@@ -79,6 +80,7 @@ export function AppSidebar() {
               <Link
                 key={href}
                 href={href}
+                aria-current={pathname === href ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors",
                   pathname === href

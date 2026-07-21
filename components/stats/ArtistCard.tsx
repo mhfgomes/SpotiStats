@@ -43,6 +43,7 @@ export function ArtistCard({
         href={externalUrl}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={`Open ${artistName} on Spotify`}
         className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 bg-spotify-card block"
       >
         {imageUrl ? (
@@ -84,7 +85,8 @@ export function ArtistCard({
         href={externalUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="opacity-0 group-hover:opacity-100 transition-opacity text-spotify-subtext hover:text-spotify-green shrink-0"
+        aria-label={`Open ${artistName} on Spotify`}
+        className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity text-spotify-subtext hover:text-spotify-green shrink-0"
       >
         <ExternalLink className="w-3.5 h-3.5" />
       </a>

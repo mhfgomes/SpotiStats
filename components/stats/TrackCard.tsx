@@ -57,6 +57,7 @@ export function TrackCard({
         href={externalUrl}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={`Open ${trackName} on Spotify`}
         className="relative w-12 h-12 rounded overflow-hidden shrink-0 bg-spotify-card block"
       >
         {albumImageUrl ? (
@@ -86,7 +87,11 @@ export function TrackCard({
             {trackName}
           </a>
           {explicit && (
-            <span className="text-[10px] bg-spotify-subtext/30 text-spotify-subtext px-1 py-0.5 rounded font-medium shrink-0">
+            <span
+              title="Explicit"
+              aria-label="Explicit"
+              className="text-[10px] bg-spotify-subtext/30 text-spotify-subtext px-1 py-0.5 rounded font-medium shrink-0"
+            >
               E
             </span>
           )}
@@ -125,7 +130,14 @@ export function TrackCard({
       )}
 
       {/* Popularity bar */}
-      <div className="hidden lg:flex items-center gap-2 w-24 shrink-0">
+      <div
+        role="meter"
+        aria-label={`Popularity ${popularity} out of 100`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={popularity}
+        className="hidden lg:flex items-center gap-2 w-24 shrink-0"
+      >
         <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
           <div
             className="h-full bg-spotify-green rounded-full"
@@ -148,7 +160,8 @@ export function TrackCard({
           href={externalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-spotify-subtext hover:text-spotify-green"
+          aria-label={`Open ${trackName} on Spotify`}
+          className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity text-spotify-subtext hover:text-spotify-green"
         >
           <ExternalLink className="w-3.5 h-3.5" />
         </a>

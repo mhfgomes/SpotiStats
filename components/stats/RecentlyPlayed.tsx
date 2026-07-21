@@ -92,6 +92,8 @@ export function RecentlyPlayed() {
             href={`https://open.spotify.com/album/${item.albumSpotifyId ?? ""}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`Open album ${item.albumName} on Spotify`}
+            tabIndex={item.albumSpotifyId ? undefined : -1}
             className={`relative w-10 h-10 rounded overflow-hidden shrink-0 bg-spotify-card${!item.albumSpotifyId ? " pointer-events-none" : ""}`}
           >
             {item.albumImageUrl ? (

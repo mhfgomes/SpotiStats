@@ -180,6 +180,7 @@ export function TrackSnapshotBoard({
               href={trackHref}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`Open ${item.trackName} on Spotify`}
               className="relative h-12 w-12 shrink-0 overflow-hidden rounded bg-white/[0.05]"
             >
               {item.albumImageUrl ? (
@@ -277,6 +278,7 @@ export function ArtistSnapshotBoard({ items }: { items: ArtistSnapshotItem[] }) 
             href={`https://open.spotify.com/artist/${item.artistSpotifyId}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`Open ${item.artistName} on Spotify`}
             className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/[0.05]"
           >
             {item.imageUrl ? (
