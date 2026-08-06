@@ -199,7 +199,24 @@ export function AppSidebar() {
                 pathname === "/stats-card/classic" ? "page" : undefined
               }
             />
-            {!collapsed && (
+            {collapsed ? (
+              <div className="mt-0.5 space-y-0.5">
+                {statsCardItems.map(({ href, icon, label }) => {
+                  const isActive = pathname === href;
+                  return (
+                    <SidebarNavLink
+                      key={href}
+                      href={href}
+                      icon={icon}
+                      label={label}
+                      isActive={isActive}
+                      collapsed
+                      ariaCurrent={isActive ? "page" : undefined}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
               <div className="ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
                 {statsCardItems.map(({ href, icon: Icon, label }) => {
                   const isActive = pathname === href;
