@@ -2,10 +2,8 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
-  useEffect,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -23,45 +21,72 @@ type SidebarContextValue = {
 
 const SidebarContext = createContext<SidebarContextValue | null>(null);
 
+let collapsedMemory = false;
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const listener of listeners) listener();
+}
+
+function readStoredCollapsed() {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+if (typeof window !== "undefined") {
+  collapsedMemory = readStoredCollapsed();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+
+  const onStorage = (event: StorageEvent) => {
+    if (event.key !== STORAGE_KEY && event.key !== null) return;
+    collapsedMemory = readStoredCollapsed();
+    emit();
+  };
+
+  window.addEventListener("storage", onStorage);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function getSnapshot() {
+  return collapsedMemory;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
+function writeCollapsed(next: boolean) {
+  collapsedMemory = next;
+  try {
+    localStorage.setItem(STORAGE_KEY, String(next));
+  } catch {
+    // Ignore storage access errors (private mode, etc.)
+  }
+  emit();
+}
+
 export function SidebarProvider({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsedState] = useState(false);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === "true") setCollapsedState(true);
-    } catch {
-      // Ignore storage access errors (private mode, etc.)
-    }
-  }, []);
-
-  const setCollapsed = useCallback((next: boolean) => {
-    setCollapsedState(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, String(next));
-    } catch {
-      // Ignore storage access errors
-    }
-  }, []);
-
-  const toggleCollapsed = useCallback(() => {
-    setCollapsedState((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(STORAGE_KEY, String(next));
-      } catch {
-        // Ignore storage access errors
-      }
-      return next;
-    });
-  }, []);
+  const collapsed = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
 
   return (
     <SidebarContext.Provider
       value={{
         collapsed,
-        toggleCollapsed,
-        setCollapsed,
+        toggleCollapsed: () => writeCollapsed(!getSnapshot()),
+        setCollapsed: writeCollapsed,
         sidebarWidth: collapsed
           ? SIDEBAR_WIDTH_COLLAPSED
           : SIDEBAR_WIDTH_EXPANDED,
