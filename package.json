@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "convex deploy --cmd \"next build\"",
+    "build:ci": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.11.5",
