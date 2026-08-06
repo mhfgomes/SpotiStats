@@ -118,31 +118,33 @@ export function AppSidebar() {
         data-collapsed={collapsed || undefined}
       >
         {/* Logo / collapse toggle */}
-        <div
-          className={cn(
-            "flex h-[73px] items-center border-b border-white/5",
-            collapsed ? "justify-center px-2" : "gap-2 px-6"
-          )}
-        >
+        <div className="border-b border-white/5">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
                 onClick={toggleCollapsed}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-spotify-green transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green focus-visible:ring-offset-2 focus-visible:ring-offset-spotify-dark"
+                className={cn(
+                  "flex h-[73px] w-full items-center transition-colors hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-spotify-green",
+                  collapsed ? "justify-center px-2" : "gap-2 px-6"
+                )}
                 aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                 aria-expanded={!collapsed}
               >
-                <Music2 className="h-4 w-4 text-black" aria-hidden="true" />
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-spotify-green">
+                  <Music2 className="h-4 w-4 text-black" aria-hidden="true" />
+                </div>
+                {!collapsed && (
+                  <span className="text-base font-bold tracking-tight">
+                    SpotiStats
+                  </span>
+                )}
               </button>
             </TooltipTrigger>
             <TooltipContent side="right">
               {collapsed ? "Expand sidebar" : "Collapse sidebar"}
             </TooltipContent>
           </Tooltip>
-          {!collapsed && (
-            <span className="text-base font-bold tracking-tight">SpotiStats</span>
-          )}
         </div>
 
         {/* Navigation */}
