@@ -7,7 +7,6 @@
     "dev": "next dev",
     "build": "convex deploy --cmd \"next build\"",
     "build:ci": "next build",
-    "codegen:ci": "bun scripts/ci-codegen.ts",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
