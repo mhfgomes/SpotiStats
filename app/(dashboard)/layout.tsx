@@ -7,6 +7,27 @@ import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { TopBar } from "@/components/layout/TopBar";
+import {
+  SidebarProvider,
+  useSidebar,
+} from "@/components/layout/sidebar-context";
+
+function DashboardShell({ children }: { children: React.ReactNode }) {
+  const { sidebarWidth } = useSidebar();
+
+  return (
+    <div className="flex min-h-screen">
+      <AppSidebar />
+      <div
+        className="flex min-h-screen flex-1 flex-col transition-[margin] duration-200 ease-out"
+        style={{ marginLeft: sidebarWidth }}
+      >
+        <TopBar />
+        <main className="flex-1 p-6">{children}</main>
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -27,11 +48,7 @@ export default function DashboardLayout({
 
   // Trigger initial sync when logged in but spotifyUsers row doesn't exist yet
   useEffect(() => {
-    if (
-      session &&
-      spotifyUser === null &&
-      !syncTriggered.current
-    ) {
+    if (session && spotifyUser === null && !syncTriggered.current) {
       syncTriggered.current = true;
       initUserSync().catch(console.error);
     }
@@ -39,8 +56,8 @@ export default function DashboardLayout({
 
   if (isPending) {
     return (
-      <div className="min-h-screen bg-spotify-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-spotify-green border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-spotify-black">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-spotify-green border-t-transparent" />
       </div>
     );
   }
@@ -48,12 +65,8 @@ export default function DashboardLayout({
   if (!session) return null;
 
   return (
-    <div className="flex min-h-screen">
-      <AppSidebar />
-      <div className="flex-1 ml-60 flex flex-col min-h-screen">
-        <TopBar />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <DashboardShell>{children}</DashboardShell>
+    </SidebarProvider>
   );
 }
