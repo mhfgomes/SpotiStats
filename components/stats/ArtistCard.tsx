@@ -13,6 +13,8 @@ interface ArtistCardProps {
   externalUrl: string;
   rankChange?: RankChange | null;
   comparisonSnapshotSyncedAt?: number | null;
+  /** Mark above-the-fold artist image as LCP-priority (disables lazy loading). */
+  priority?: boolean;
 }
 
 export function ArtistCard({
@@ -23,6 +25,7 @@ export function ArtistCard({
   externalUrl,
   rankChange,
   comparisonSnapshotSyncedAt,
+  priority = false,
 }: ArtistCardProps) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
@@ -52,6 +55,8 @@ export function ArtistCard({
             fill
             className="object-cover"
             sizes="48px"
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
           />
         ) : (
           <div className="w-full h-full rounded-full bg-spotify-card flex items-center justify-center">
