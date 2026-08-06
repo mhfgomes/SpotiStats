@@ -20,6 +20,14 @@ import {
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/layout/sidebar-context";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -189,58 +197,88 @@ export function AppSidebar() {
 
           {/* Stats Card section */}
           <div className={cn(!collapsed && "pt-1")}>
-            <SidebarNavLink
-              href="/stats-card"
-              icon={ImageIcon}
-              label="Stats Cards"
-              isActive={isStatsCardSection}
-              collapsed={collapsed}
-              ariaCurrent={
-                pathname === "/stats-card/classic" ? "page" : undefined
-              }
-            />
             {collapsed ? (
-              <div className="mt-0.5 space-y-0.5">
-                {statsCardItems.map(({ href, icon, label }) => {
-                  const isActive = pathname === href;
-                  return (
-                    <SidebarNavLink
-                      key={href}
-                      href={href}
-                      icon={icon}
-                      label={label}
-                      isActive={isActive}
-                      collapsed
-                      ariaCurrent={isActive ? "page" : undefined}
-                    />
-                  );
-                })}
-              </div>
+              <DropdownMenu>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className={cn(
+                          "sidebar-link w-full justify-center px-0",
+                          isStatsCardSection && "active"
+                        )}
+                        aria-label="Stats Cards"
+                        aria-haspopup="menu"
+                      >
+                        <ImageIcon className="h-4 w-4 shrink-0" aria-hidden />
+                      </button>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Stats Cards</TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent side="right" align="start" className="w-48">
+                  <DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-widest text-white/45">
+                    Stats Cards
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {statsCardItems.map(({ href, icon: Icon, label }) => {
+                    const isActive = pathname === href;
+                    return (
+                      <DropdownMenuItem key={href} asChild>
+                        <Link
+                          href={href}
+                          className={cn(
+                            "gap-2.5",
+                            isActive && "bg-white/10 text-white"
+                          )}
+                          aria-current={isActive ? "page" : undefined}
+                        >
+                          <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                          <span>{label}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
-              <div className="ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
-                {statsCardItems.map(({ href, icon: Icon, label }) => {
-                  const isActive = pathname === href;
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
-                        isActive
-                          ? "bg-white/10 text-white"
-                          : "text-spotify-subtext hover:bg-white/5 hover:text-white"
-                      )}
-                      aria-current={isActive ? "page" : undefined}
-                    >
-                      <Icon
-                        className="h-3.5 w-3.5 shrink-0"
-                        aria-hidden="true"
-                      />
-                      <span>{label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+              <>
+                <SidebarNavLink
+                  href="/stats-card"
+                  icon={ImageIcon}
+                  label="Stats Cards"
+                  isActive={isStatsCardSection}
+                  collapsed={false}
+                  ariaCurrent={
+                    pathname === "/stats-card/classic" ? "page" : undefined
+                  }
+                />
+                <div className="ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
+                  {statsCardItems.map(({ href, icon: Icon, label }) => {
+                    const isActive = pathname === href;
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
+                          isActive
+                            ? "bg-white/10 text-white"
+                            : "text-spotify-subtext hover:bg-white/5 hover:text-white"
+                        )}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        <Icon
+                          className="h-3.5 w-3.5 shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span>{label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
         </nav>
