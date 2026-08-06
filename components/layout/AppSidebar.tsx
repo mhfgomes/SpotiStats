@@ -16,8 +16,6 @@ import {
   Headphones,
   CreditCard,
   User,
-  PanelLeftClose,
-  PanelLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/layout/sidebar-context";
@@ -119,16 +117,29 @@ export function AppSidebar() {
         )}
         data-collapsed={collapsed || undefined}
       >
-        {/* Logo */}
+        {/* Logo / collapse toggle */}
         <div
           className={cn(
             "flex h-[73px] items-center border-b border-white/5",
             collapsed ? "justify-center px-2" : "gap-2 px-6"
           )}
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-spotify-green">
-            <Music2 className="h-4 w-4 text-black" aria-hidden="true" />
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={toggleCollapsed}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-spotify-green transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spotify-green focus-visible:ring-offset-2 focus-visible:ring-offset-spotify-dark"
+                aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                aria-expanded={!collapsed}
+              >
+                <Music2 className="h-4 w-4 text-black" aria-hidden="true" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            </TooltipContent>
+          </Tooltip>
           {!collapsed && (
             <span className="text-base font-bold tracking-tight">SpotiStats</span>
           )}
@@ -217,7 +228,7 @@ export function AppSidebar() {
 
         <div
           className={cn(
-            "space-y-1 border-t border-white/5 py-3",
+            "border-t border-white/5 py-3",
             collapsed ? "px-2" : "px-3"
           )}
         >
@@ -229,34 +240,6 @@ export function AppSidebar() {
             collapsed={collapsed}
             ariaCurrent={pathname === "/account" ? "page" : undefined}
           />
-
-          {collapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={toggleCollapsed}
-                  className="sidebar-link w-full justify-center px-0"
-                  aria-label="Expand sidebar"
-                  aria-expanded={false}
-                >
-                  <PanelLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="right">Expand sidebar</TooltipContent>
-            </Tooltip>
-          ) : (
-            <button
-              type="button"
-              onClick={toggleCollapsed}
-              className="sidebar-link w-full"
-              aria-label="Collapse sidebar"
-              aria-expanded={true}
-            >
-              <PanelLeftClose className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="text-sm font-medium">Collapse</span>
-            </button>
-          )}
         </div>
       </aside>
     </TooltipProvider>
