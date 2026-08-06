@@ -64,7 +64,7 @@ export function TopTracksList({ timeRange }: TopTracksListProps) {
 
   return (
     <div className="divide-y divide-white/5">
-      {tracks.map((track) => {
+      {tracks.map((track, index) => {
         const previousRank = data?.hasComparisonSnapshot
           ? data.previousTrackRanks[track.trackSpotifyId] ?? null
           : undefined;
@@ -85,6 +85,7 @@ export function TopTracksList({ timeRange }: TopTracksListProps) {
             popularity={track.popularity}
             rankChange={getRankChange(track.rank, previousRank)}
             comparisonSnapshotSyncedAt={data?.previousTrackSnapshotSyncedAt}
+            priority={index === 0}
           />
         );
       })}

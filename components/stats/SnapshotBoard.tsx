@@ -161,12 +161,13 @@ export function TrackSnapshotBoard({
 }) {
   return (
     <div className="divide-y divide-white/5">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const trackHref =
           item.externalUrl ?? `https://open.spotify.com/track/${item.trackSpotifyId}`;
         const needsMetadata =
           typeof item.popularity !== "number" || typeof item.durationMs !== "number";
         const showMetadataSkeleton = isMetadataLoading && needsMetadata;
+        const priority = index === 0;
 
         return (
           <div
@@ -189,6 +190,8 @@ export function TrackSnapshotBoard({
                   fill
                   className="object-cover"
                   sizes="48px"
+                  priority={priority}
+                  loading={priority ? "eager" : "lazy"}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-xs text-spotify-subtext">
@@ -255,7 +258,7 @@ export function TrackSnapshotBoard({
               )}
             </span>
             <span className="w-5 shrink-0" />
-         </div>
+          </div>
         );
       })}
     </div>
@@ -265,50 +268,56 @@ export function TrackSnapshotBoard({
 export function ArtistSnapshotBoard({ items }: { items: ArtistSnapshotItem[] }) {
   return (
     <div className="divide-y divide-white/5">
-      {items.map((item) => (
-        <div
-          key={`${item.rank}-${item.artistSpotifyId}`}
-          className="flex items-center gap-4 p-3 transition-colors hover:bg-white/[0.03]"
-        >
-          <span className="w-6 shrink-0 text-right font-mono text-sm text-spotify-subtext">
-            {item.rank}
-          </span>
-          <a
-            href={`https://open.spotify.com/artist/${item.artistSpotifyId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/[0.05]"
+      {items.map((item, index) => {
+        const priority = index === 0;
+
+        return (
+          <div
+            key={`${item.rank}-${item.artistSpotifyId}`}
+            className="flex items-center gap-4 p-3 transition-colors hover:bg-white/[0.03]"
           >
-            {item.imageUrl ? (
-              <Image
-                src={item.imageUrl}
-                alt={item.artistName}
-                fill
-                className="object-cover"
-                sizes="48px"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs text-spotify-subtext">
-                ♪
-              </div>
-            )}
-          </a>
-          <div className="min-w-0 flex-1">
+            <span className="w-6 shrink-0 text-right font-mono text-sm text-spotify-subtext">
+              {item.rank}
+            </span>
             <a
               href={`https://open.spotify.com/artist/${item.artistSpotifyId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block truncate text-sm font-medium transition-colors hover:text-spotify-green"
+              className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/[0.05]"
             >
-              {item.artistName}
+              {item.imageUrl ? (
+                <Image
+                  src={item.imageUrl}
+                  alt={item.artistName}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                  priority={priority}
+                  loading={priority ? "eager" : "lazy"}
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs text-spotify-subtext">
+                  ♪
+                </div>
+              )}
             </a>
+            <div className="min-w-0 flex-1">
+              <a
+                href={`https://open.spotify.com/artist/${item.artistSpotifyId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block truncate text-sm font-medium transition-colors hover:text-spotify-green"
+              >
+                {item.artistName}
+              </a>
+            </div>
+            <span className="flex-1 truncate text-xs text-spotify-subtext">
+              {item.genres.slice(0, 3).join(" · ") || "No genres listed"}
+            </span>
+            <span className="w-5 shrink-0" />
           </div>
-          <span className="flex-1 truncate text-xs text-spotify-subtext">
-            {item.genres.slice(0, 3).join(" · ") || "No genres listed"}
-          </span>
-          <span className="w-5 shrink-0" />
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

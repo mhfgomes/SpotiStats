@@ -58,7 +58,7 @@ export function TopArtistsList({ timeRange }: TopArtistsListProps) {
 
   return (
     <div className="divide-y divide-white/5">
-      {artists.map((artist) => {
+      {artists.map((artist, index) => {
         const previousRank = data?.hasComparisonSnapshot
           ? data.previousArtistRanks[artist.artistSpotifyId] ?? null
           : undefined;
@@ -73,6 +73,7 @@ export function TopArtistsList({ timeRange }: TopArtistsListProps) {
             externalUrl={artist.externalUrl}
             rankChange={getRankChange(artist.rank, previousRank)}
             comparisonSnapshotSyncedAt={data?.previousArtistSnapshotSyncedAt}
+            priority={index === 0}
           />
         );
       })}

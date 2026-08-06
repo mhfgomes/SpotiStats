@@ -20,6 +20,8 @@ interface TrackCardProps {
   popularity: number;
   rankChange?: RankChange | null;
   comparisonSnapshotSyncedAt?: number | null;
+  /** Mark above-the-fold album art as LCP-priority (disables lazy loading). */
+  priority?: boolean;
 }
 
 export function TrackCard({
@@ -36,6 +38,7 @@ export function TrackCard({
   popularity,
   rankChange,
   comparisonSnapshotSyncedAt,
+  priority = false,
 }: TrackCardProps) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
@@ -66,6 +69,8 @@ export function TrackCard({
             fill
             className="object-cover"
             sizes="48px"
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
           />
         ) : (
           <div className="w-full h-full bg-spotify-card flex items-center justify-center">
