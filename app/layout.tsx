@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/layout/ConvexClientProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "SpotiStats — Your Spotify Listening Stats",
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="bg-spotify-black text-white antialiased">
         <ConvexClientProvider>{children}</ConvexClientProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
