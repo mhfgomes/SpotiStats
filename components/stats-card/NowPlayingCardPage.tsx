@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatsCardPageSkeleton } from "@/components/stats-card/StatsCardPageSkeleton";
+import { CardPreview } from "@/components/stats-card/CardPreview";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -169,16 +170,12 @@ export function NowPlayingCardPage() {
             </CardHeader>
             <CardContent>
               {nowPlayingUrl ? (
-                <div className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    key={`${nowPlayingUrl}-${previewKey}`}
-                    src={nowPlayingUrl}
-                    alt="Now playing preview"
-                    className="w-full"
-                    style={{ aspectRatio: "800/200" }}
-                  />
-                </div>
+                <CardPreview
+                  key={`${nowPlayingUrl}-${previewKey}`}
+                  src={nowPlayingUrl}
+                  alt="Now playing preview"
+                  aspectRatio="800/200"
+                />
               ) : (
                 <Skeleton
                   className="w-full rounded-xl"

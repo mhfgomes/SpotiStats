@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatsCardPageSkeleton } from "@/components/stats-card/StatsCardPageSkeleton";
+import { CardPreview } from "@/components/stats-card/CardPreview";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -250,16 +251,12 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
             </CardHeader>
             <CardContent>
               {cardUrl ? (
-                <div className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    key={`${cardUrl}-${previewKey}`}
-                    src={cardUrl}
-                    alt="Stats card preview"
-                    className="w-full"
-                    style={{ aspectRatio: meta.aspect }}
-                  />
-                </div>
+                <CardPreview
+                  key={`${cardUrl}-${previewKey}`}
+                  src={cardUrl}
+                  alt="Stats card preview"
+                  aspectRatio={meta.aspect}
+                />
               ) : (
                 <Skeleton
                   className="w-full rounded-xl"
