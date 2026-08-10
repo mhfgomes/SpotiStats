@@ -11,6 +11,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatsCardPageSkeleton } from "@/components/stats-card/StatsCardPageSkeleton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -103,14 +104,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   }, []);
 
   if (user === undefined) {
-    return (
-      <div className="mx-auto max-w-5xl space-y-4">
-        <div className="mt-2 flex gap-6">
-          <Skeleton className="h-80 w-72 rounded-2xl" />
-          <Skeleton className="h-80 flex-1 rounded-2xl" />
-        </div>
-      </div>
-    );
+    return <StatsCardPageSkeleton />;
   }
 
   return (
