@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -19,10 +19,6 @@ export function CardPreview({
 }: CardPreviewProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    setIsLoaded(false);
-  }, [src]);
-
   return (
     <div
       className={cn(
@@ -40,8 +36,13 @@ export function CardPreview({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
-        alt={alt}
+        alt=""
         onLoad={() => setIsLoaded(true)}
+        ref={(img) => {
+          if (img?.complete && img.naturalWidth > 0) {
+            setIsLoaded(true);
+          }
+        }}
         className={cn(
           "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
           isLoaded ? "opacity-100" : "opacity-0"
