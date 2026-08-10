@@ -11,6 +11,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatsCardPageSkeleton } from "@/components/stats-card/StatsCardPageSkeleton";
+import { CardPreview } from "@/components/stats-card/CardPreview";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -83,6 +85,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   const cardUrl = user
     ? `${baseUrl}/api/card/${user._id}?type=${type}&theme=${theme}&range=${range}`
     : null;
+  const previewSrc = cardUrl ? `${cardUrl}&_v=${previewKey}` : null;
 
   const htmlSnippet = cardUrl
     ? wrapWithLink
@@ -103,14 +106,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   }, []);
 
   if (user === undefined) {
-    return (
-      <div className="mx-auto max-w-5xl space-y-4">
-        <div className="mt-2 flex gap-6">
-          <Skeleton className="h-80 w-72 rounded-2xl" />
-          <Skeleton className="h-80 flex-1 rounded-2xl" />
-        </div>
-      </div>
-    );
+    return <StatsCardPageSkeleton />;
   }
 
   return (
@@ -255,17 +251,13 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
               </div>
             </CardHeader>
             <CardContent>
-              {cardUrl ? (
-                <div className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    key={`${cardUrl}-${previewKey}`}
-                    src={cardUrl}
-                    alt="Stats card preview"
-                    className="w-full"
-                    style={{ aspectRatio: meta.aspect }}
-                  />
-                </div>
+              {previewSrc ? (
+                <CardPreview
+                  key={previewSrc}
+                  src={previewSrc}
+                  alt="Stats card preview"
+                  aspectRatio={meta.aspect}
+                />
               ) : (
                 <Skeleton
                   className="w-full rounded-xl"

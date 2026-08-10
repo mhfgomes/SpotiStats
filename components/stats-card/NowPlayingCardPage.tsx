@@ -11,6 +11,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatsCardPageSkeleton } from "@/components/stats-card/StatsCardPageSkeleton";
+import { CardPreview } from "@/components/stats-card/CardPreview";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,6 +42,9 @@ export function NowPlayingCardPage() {
   const nowPlayingUrl = user
     ? `${baseUrl}/api/now-playing/${user._id}?theme=${theme}`
     : null;
+  const previewSrc = nowPlayingUrl
+    ? `${nowPlayingUrl}&_v=${previewKey}`
+    : null;
 
   const mdSnippet = nowPlayingUrl
     ? wrapWithLink
@@ -54,14 +59,7 @@ export function NowPlayingCardPage() {
   }, []);
 
   if (user === undefined) {
-    return (
-      <div className="mx-auto max-w-5xl space-y-4">
-        <div className="mt-2 flex gap-6">
-          <Skeleton className="h-72 w-72 rounded-2xl" />
-          <Skeleton className="h-72 flex-1 rounded-2xl" />
-        </div>
-      </div>
-    );
+    return <StatsCardPageSkeleton />;
   }
 
   return (
@@ -174,17 +172,13 @@ export function NowPlayingCardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {nowPlayingUrl ? (
-                <div className="overflow-hidden rounded-xl border border-white/8 bg-black/20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    key={`${nowPlayingUrl}-${previewKey}`}
-                    src={nowPlayingUrl}
-                    alt="Now playing preview"
-                    className="w-full"
-                    style={{ aspectRatio: "800/200" }}
-                  />
-                </div>
+              {previewSrc ? (
+                <CardPreview
+                  key={previewSrc}
+                  src={previewSrc}
+                  alt="Now playing preview"
+                  aspectRatio="800/200"
+                />
               ) : (
                 <Skeleton
                   className="w-full rounded-xl"
