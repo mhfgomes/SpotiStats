@@ -85,6 +85,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   const cardUrl = user
     ? `${baseUrl}/api/card/${user._id}?type=${type}&theme=${theme}&range=${range}`
     : null;
+  const previewSrc = cardUrl ? `${cardUrl}&_v=${previewKey}` : null;
 
   const htmlSnippet = cardUrl
     ? wrapWithLink
@@ -250,10 +251,10 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
               </div>
             </CardHeader>
             <CardContent>
-              {cardUrl ? (
+              {previewSrc ? (
                 <CardPreview
-                  key={`${cardUrl}-${previewKey}`}
-                  src={cardUrl}
+                  key={previewSrc}
+                  src={previewSrc}
                   alt="Stats card preview"
                   aspectRatio={meta.aspect}
                 />

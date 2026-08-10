@@ -42,6 +42,9 @@ export function NowPlayingCardPage() {
   const nowPlayingUrl = user
     ? `${baseUrl}/api/now-playing/${user._id}?theme=${theme}`
     : null;
+  const previewSrc = nowPlayingUrl
+    ? `${nowPlayingUrl}&_v=${previewKey}`
+    : null;
 
   const mdSnippet = nowPlayingUrl
     ? wrapWithLink
@@ -169,10 +172,10 @@ export function NowPlayingCardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {nowPlayingUrl ? (
+              {previewSrc ? (
                 <CardPreview
-                  key={`${nowPlayingUrl}-${previewKey}`}
-                  src={nowPlayingUrl}
+                  key={previewSrc}
+                  src={previewSrc}
                   alt="Now playing preview"
                   aspectRatio="800/200"
                 />
