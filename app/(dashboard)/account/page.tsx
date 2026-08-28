@@ -92,59 +92,58 @@ function AccountPageContent() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isRevoking, setIsRevoking] = useState(false);
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
-  const [isLoadingLocations, setIsLoadingLocations] = useState(false);
-  const [sessionLocations, setSessionLocations] = useState<Record<string, string | null>>({});
+  const [locationResult, setLocationResult] = useState<{
+    key: string;
+    locations: Record<string, string | null>;
+  } | null>(null);
   const [refreshFeedback, setRefreshFeedback] = useState<FeedbackState>(null);
   const [sessionFeedback, setSessionFeedback] = useState<FeedbackState>(null);
 
+  const sessionIps = Array.from(
+    new Set(
+      (data?.sessions ?? [])
+        .map((session) => session.ipAddressMasked?.trim())
+        .filter((ip): ip is string => Boolean(ip))
+    )
+  );
+  const sessionIpsKey = sessionIps.join(",");
+  const sessionLocations =
+    sessionIps.length === 0 || locationResult?.key !== sessionIpsKey
+      ? {}
+      : locationResult.locations;
+  const isLoadingLocations =
+    sessionIps.length > 0 && locationResult?.key !== sessionIpsKey;
+
   useEffect(() => {
-    if (!data?.sessions.length) {
-      setSessionLocations({});
-      setIsLoadingLocations(false);
+    if (!sessionIpsKey) {
       return;
     }
 
     let isCancelled = false;
-    setIsLoadingLocations(true);
-
-    const ips = Array.from(
-      new Set(
-        data.sessions
-          .map((session) => session.ipAddressMasked?.trim())
-          .filter((ip): ip is string => Boolean(ip))
-      )
-    );
-
-    if (ips.length === 0) {
-      setSessionLocations({});
-      setIsLoadingLocations(false);
-      return;
-    }
+    const key = sessionIpsKey;
+    const ips = key.split(",");
 
     getSessionLocations({
       ips,
     })
       .then((results) => {
         if (isCancelled) return;
-        setSessionLocations(
-          Object.fromEntries(
+        setLocationResult({
+          key,
+          locations: Object.fromEntries(
             results.map((result) => [result.ip, result.locationLabel])
-          )
-        );
+          ),
+        });
       })
       .catch(() => {
         if (isCancelled) return;
-        setSessionLocations({});
-      })
-      .finally(() => {
-        if (isCancelled) return;
-        setIsLoadingLocations(false);
+        setLocationResult({ key, locations: {} });
       });
 
     return () => {
       isCancelled = true;
     };
-  }, [data?.sessions, getSessionLocations]);
+  }, [sessionIpsKey, getSessionLocations]);
 
   const handleRefreshProfile = async () => {
     setIsRefreshing(true);
