@@ -9,19 +9,29 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: 1.4.0
+          node-version: 22.13.0
+          cache: pnpm
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - run: bun run lint
+      - name: Lint workspaces
+        run: pnpm lint
 
-      - run: bun run typecheck
+      - name: Type-check workspaces
+        run: pnpm typecheck
 
-      - run: bun run build:ci
+      - name: Build web app
+        run: pnpm build:ci
         env:
           NEXT_PUBLIC_CONVEX_URL: https://example.convex.cloud
           NEXT_PUBLIC_CONVEX_SITE_URL: https://example.convex.site
