@@ -23,10 +23,9 @@ export const createAuth = <DM extends GenericDataModel>(ctx: GenericCtx<DM>) => 
   }
 
   return betterAuth({
-    // Keep the OAuth callback on Convex's public HTTPS endpoint. Deriving this
-    // from request headers can turn a LAN development host into Spotify's
-    // redirect_uri when the request is proxied by the local web application.
-    baseURL: authUrl,
+    // OAuth starts and completes on the web app's origin. The Next.js auth
+    // route proxies requests to Convex while preserving first-party cookies.
+    baseURL: siteUrl,
     basePath: "/api/auth",
     secret: process.env.BETTER_AUTH_SECRET,
     database: convexAdapter(
