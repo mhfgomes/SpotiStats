@@ -46,6 +46,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build": "expo export --platform all",
+    "package:android": "./scripts/package-android.sh",
+    "package:ios": "./scripts/package-ios.sh",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit"
   },

@@ -51,18 +51,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate Android project
-        working-directory: apps/mobile
-        run: pnpm exec expo prebuild --platform android --clean
-        env:
-          CI: "1"
-
-      - name: Build release APK
-        working-directory: apps/mobile/android
-        run: ./gradlew assembleRelease --no-daemon
+      - name: Package Android app
+        run: pnpm package:android
 
       - name: Stage Android artifact
-        run: cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk "SpotiStats-${GITHUB_REF_NAME}-android.apk"
+        run: cp apps/mobile/dist/SpotiStats-android.apk "SpotiStats-${GITHUB_REF_NAME}-android.apk"
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v4
@@ -95,30 +88,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate iOS project
-        working-directory: apps/mobile
-        run: pnpm exec expo prebuild --platform ios --clean
-        env:
-          CI: "1"
-
-      - name: Build iOS Simulator app
-        working-directory: apps/mobile
-        run: |
-          xcodebuild \
-            -workspace ios/SpotiStats.xcworkspace \
-            -scheme SpotiStats \
-            -configuration Release \
-            -sdk iphonesimulator \
-            -derivedDataPath build/ios-simulator \
-            CODE_SIGNING_ALLOWED=NO \
-            build
+      - name: Package iOS Simulator app
+        run: pnpm package:ios
 
       - name: Stage iOS Simulator artifact
-        working-directory: apps/mobile
-        run: |
-          app_path=$(find build/ios-simulator/Build/Products/Release-iphonesimulator -maxdepth 1 -name '*.app' -print -quit)
-          test -n "$app_path" || { echo "iOS Simulator app was not produced"; exit 1; }
-          ditto -c -k --sequesterRsrc --keepParent "$app_path" "../../SpotiStats-${GITHUB_REF_NAME}-ios-simulator.app.zip"
+        run: cp apps/mobile/dist/SpotiStats-ios-simulator.app.zip "SpotiStats-${GITHUB_REF_NAME}-ios-simulator.app.zip"
 
       - name: Upload iOS Simulator artifact
         uses: actions/upload-artifact@v4
