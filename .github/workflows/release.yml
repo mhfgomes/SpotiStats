@@ -3,7 +3,13 @@ name: Mobile release
 on:
   push:
     tags:
-      - "v.*"
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to build
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -15,6 +21,7 @@ concurrency:
 env:
   EXPO_PUBLIC_CONVEX_URL: ${{ vars.EXPO_PUBLIC_CONVEX_URL }}
   EXPO_PUBLIC_AUTH_URL: ${{ vars.EXPO_PUBLIC_AUTH_URL }}
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   android:
@@ -23,6 +30,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -55,13 +64,13 @@ jobs:
         run: pnpm package:android
 
       - name: Stage Android artifact
-        run: cp apps/mobile/dist/SpotiStats-android.apk "SpotiStats-${GITHUB_REF_NAME}-android.apk"
+        run: cp apps/mobile/dist/SpotiStats-android.apk "SpotiStats-${RELEASE_TAG}-android.apk"
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-release
-          path: SpotiStats-${{ github.ref_name }}-android.apk
+          path: SpotiStats-${{ env.RELEASE_TAG }}-android.apk
           if-no-files-found: error
 
   ios-simulator:
@@ -70,6 +79,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -96,16 +107,16 @@ jobs:
 
       - name: Stage iOS artifacts
         run: |
-          cp apps/mobile/dist/SpotiStats-ios-simulator.app.zip "SpotiStats-${GITHUB_REF_NAME}-ios-simulator.app.zip"
-          cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${GITHUB_REF_NAME}-ios-unsigned.ipa"
+          cp apps/mobile/dist/SpotiStats-ios-simulator.app.zip "SpotiStats-${RELEASE_TAG}-ios-simulator.app.zip"
+          cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${RELEASE_TAG}-ios-unsigned.ipa"
 
       - name: Upload iOS artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ios-release
           path: |
-            SpotiStats-${{ github.ref_name }}-ios-simulator.app.zip
-            SpotiStats-${{ github.ref_name }}-ios-unsigned.ipa
+            SpotiStats-${{ env.RELEASE_TAG }}-ios-simulator.app.zip
+            SpotiStats-${{ env.RELEASE_TAG }}-ios-unsigned.ipa
           if-no-files-found: error
 
   release:
@@ -123,6 +134,7 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
           files: release-artifacts/*
           generate_release_notes: true
           fail_on_unmatched_files: true
