@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, LoadingState, SignedOutState } from '@/components/spotify-state';
 import { ArtistRow, GenreRow, RangePicker, TrackRow } from '@/components/stats-ui';
-import type { RecentlyPlayedItem, SpotifyTopData, TimeRange } from '@/lib/backend';
+import type { RecentlyPlayedItem, SpotifyTopData } from '@/lib/backend';
 import { colors, type } from '@/lib/theme';
 import { useSpotifyData } from '@/providers/spotify-data';
 
@@ -15,8 +15,7 @@ const views: { key: ViewKey; label: string }[] = [
 ];
 
 export default function LibraryScreen() {
-  const { data, error, isLoading, isSignedIn, recent, refresh } = useSpotifyData();
-  const [range, setRange] = useState<TimeRange>('medium_term');
+  const { data, error, isLoading, isSignedIn, range, recent, refresh, setRange } = useSpotifyData();
   const [view, setView] = useState<ViewKey>('tracks');
   const stats = data[range];
 
@@ -33,7 +32,6 @@ export default function LibraryScreen() {
             <Text style={styles.kicker}>YOUR MUSIC LIBRARY</Text>
             <Text style={styles.title}>The full picture</Text>
             <Text style={styles.subtitle}>Every ranking and taste signal from your Spotify listening.</Text>
-            <RangePicker value={range} onChange={setRange} />
           </View>
           <View style={styles.stickyWrap}>
             <View style={styles.viewPicker}>
@@ -47,6 +45,11 @@ export default function LibraryScreen() {
                 );
               })}
             </View>
+            {view !== 'taste' && view !== 'history' ? (
+              <View style={styles.rangeWrap}>
+                <RangePicker fullWidth value={range} onChange={setRange} />
+              </View>
+            ) : null}
           </View>
           <View style={styles.summary}><Text style={styles.summaryTitle}>{viewTitle(view)}</Text><Text style={styles.summaryCount}>{viewCount(stats, view, recent)}</Text></View>
           <View style={styles.results}>{renderView(stats, view, recent)}</View>
@@ -120,7 +123,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background }, safeArea: { flex: 1 }, content: { paddingBottom: 120 },
   header: { paddingHorizontal: 16, paddingTop: 28, paddingBottom: 24, gap: 13 }, kicker: { color: colors.green, fontFamily: type.data, fontSize: 9, fontWeight: '900', letterSpacing: 1.7 },
   title: { color: colors.text, fontSize: 34, fontWeight: '900', letterSpacing: -1.4 }, subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, maxWidth: 340, marginBottom: 5 },
-  stickyWrap: { backgroundColor: colors.background, paddingHorizontal: 16, paddingBottom: 10 }, viewPicker: { height: 48, flexDirection: 'row', backgroundColor: colors.card, borderRadius: 10, paddingHorizontal: 4 },
+  stickyWrap: { backgroundColor: colors.background, paddingHorizontal: 16, paddingBottom: 10 }, viewPicker: { height: 48, flexDirection: 'row', backgroundColor: colors.card, borderRadius: 10, paddingHorizontal: 4 }, rangeWrap: { marginTop: 12 },
   viewButton: { flex: 1, alignItems: 'center', justifyContent: 'center', position: 'relative' }, viewText: { color: colors.muted, fontSize: 12, fontWeight: '700' }, viewTextActive: { color: colors.text }, viewIndicator: { position: 'absolute', bottom: 0, width: 24, height: 3, borderRadius: 3, backgroundColor: colors.green },
   summary: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 8 }, summaryTitle: { color: colors.text, fontSize: 20, fontWeight: '800' }, summaryCount: { color: colors.faint, fontFamily: type.data, fontSize: 9, letterSpacing: 1 },
   results: { marginHorizontal: 10, backgroundColor: colors.surface, borderRadius: 12, paddingVertical: 6, overflow: 'hidden' }, genreResults: { paddingHorizontal: 10 },

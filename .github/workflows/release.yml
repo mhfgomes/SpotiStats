@@ -48,6 +48,9 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
@@ -72,8 +75,8 @@ jobs:
           path: SpotiStats-${{ env.RELEASE_TAG }}-android.apk
           if-no-files-found: error
 
-  ios-simulator:
-    name: Build iOS Simulator app
+  ios-unsigned:
+    name: Build unsigned iOS IPA
     runs-on: macos-26
     steps:
       - name: Check out repository
@@ -90,6 +93,13 @@ jobs:
           node-version: 22.13.0
           cache: pnpm
 
+      - name: Cache CocoaPods downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: cocoapods-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: cocoapods-${{ runner.os }}-
+
       - name: Validate release configuration
         run: |
           test -n "$EXPO_PUBLIC_CONVEX_URL" || { echo "Missing repository variable EXPO_PUBLIC_CONVEX_URL"; exit 1; }
@@ -98,29 +108,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Package iOS Simulator app
-        run: pnpm package:ios
-
       - name: Package unsigned iOS IPA
         run: pnpm package:ios:ipa
 
-      - name: Stage iOS artifacts
-        run: |
-          cp apps/mobile/dist/SpotiStats-ios-simulator.app.zip "SpotiStats-${RELEASE_TAG}-ios-simulator.app.zip"
-          cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${RELEASE_TAG}-ios-unsigned.ipa"
+      - name: Stage unsigned iOS artifact
+        run: cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${RELEASE_TAG}-ios-unsigned.ipa"
 
-      - name: Upload iOS artifacts
+      - name: Upload unsigned iOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-release
-          path: |
-            SpotiStats-${{ env.RELEASE_TAG }}-ios-simulator.app.zip
-            SpotiStats-${{ env.RELEASE_TAG }}-ios-unsigned.ipa
+          name: ios-unsigned-release
+          path: SpotiStats-${{ env.RELEASE_TAG }}-ios-unsigned.ipa
           if-no-files-found: error
 
   release:
     name: Publish GitHub release
-    needs: [android, ios-simulator]
+    needs: [android, ios-unsigned]
     runs-on: ubuntu-latest
     steps:
       - name: Download mobile artifacts

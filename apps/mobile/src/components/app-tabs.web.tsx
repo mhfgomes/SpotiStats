@@ -14,6 +14,9 @@ export default function AppTabs() {
         <TabTrigger name="library" href={'/explore' as Href} asChild>
           <Pressable style={styles.tab}><Text style={styles.label}>ALL STATS</Text></Pressable>
         </TabTrigger>
+        <TabTrigger name="settings" href={'/settings' as Href} asChild>
+          <Pressable style={styles.tab}><Text style={styles.label}>SETTINGS</Text></Pressable>
+        </TabTrigger>
       </TabList>
     </Tabs>
   );

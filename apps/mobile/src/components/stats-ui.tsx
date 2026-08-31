@@ -10,9 +10,9 @@ export const rangeOptions: { key: TimeRange; label: string; shortLabel: string }
   { key: 'long_term', label: 'All time', shortLabel: 'All time' },
 ];
 
-export function RangePicker({ value, onChange }: { value: TimeRange; onChange: (value: TimeRange) => void }) {
+export function RangePicker({ value, onChange, fullWidth = false }: { value: TimeRange; onChange: (value: TimeRange) => void; fullWidth?: boolean }) {
   return (
-    <View style={styles.rangePicker}>
+    <View style={[styles.rangePicker, fullWidth && styles.rangePickerFullWidth]}>
       {rangeOptions.map((option) => {
         const selected = option.key === value;
         return (
@@ -21,7 +21,7 @@ export function RangePicker({ value, onChange }: { value: TimeRange; onChange: (
             accessibilityState={{ selected }}
             key={option.key}
             onPress={() => onChange(option.key)}
-            style={[styles.rangeButton, selected && styles.rangeButtonActive]}>
+            style={[styles.rangeButton, fullWidth && styles.rangeButtonFullWidth, selected && styles.rangeButtonActive]}>
             <Text style={[styles.rangeText, selected && styles.rangeTextActive]}>{option.shortLabel}</Text>
           </Pressable>
         );
@@ -113,7 +113,9 @@ function Movement({ current, previous }: { current: number; previous: number }) 
 
 const styles = StyleSheet.create({
   rangePicker: { flexDirection: 'row', alignSelf: 'flex-start', backgroundColor: colors.card, borderRadius: 999, padding: 3, gap: 2 },
+  rangePickerFullWidth: { alignSelf: 'stretch' },
   rangeButton: { paddingHorizontal: 13, paddingVertical: 8, borderRadius: 999 },
+  rangeButtonFullWidth: { flex: 1, alignItems: 'center' },
   rangeButtonActive: { backgroundColor: colors.text },
   rangeText: { color: colors.muted, fontSize: 12, fontWeight: '700' },
   rangeTextActive: { color: colors.black },

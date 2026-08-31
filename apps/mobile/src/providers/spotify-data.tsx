@@ -14,13 +14,16 @@ import {
 type RangeData = Partial<Record<TimeRange, SpotifyTopData>>;
 
 interface SpotifyDataContextValue {
+  avatarUrl: string | null;
   data: RangeData;
   error: string | null;
   isLoading: boolean;
   isSignedIn: boolean;
   name: string;
+  range: TimeRange;
   recent: RecentlyPlayedItem[];
   refresh: () => Promise<void>;
+  setRange: (range: TimeRange) => void;
 }
 
 const SpotifyDataContext = createContext<SpotifyDataContextValue | null>(null);
@@ -35,6 +38,7 @@ export function SpotifyDataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<RangeData>({});
   const [error, setError] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
+  const [range, setRange] = useState<TimeRange>('medium_term');
   const [recent, setRecent] = useState<RecentlyPlayedItem[]>([]);
 
   const refresh = async () => {
@@ -67,13 +71,16 @@ export function SpotifyDataProvider({ children }: { children: ReactNode }) {
   return (
     <SpotifyDataContext.Provider
       value={{
+        avatarUrl: session?.user.image ?? null,
         data,
         error,
         isLoading: isPending || isConvexLoading || isFetching,
         isSignedIn: Boolean(session && isAuthenticated),
         name: session?.user.name ?? 'Listener',
+        range,
         recent,
         refresh,
+        setRange,
       }}>
       {children}
     </SpotifyDataContext.Provider>

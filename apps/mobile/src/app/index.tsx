@@ -1,18 +1,14 @@
 import { Image } from 'expo-image';
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, LoadingState, SignedOutState } from '@/components/spotify-state';
 import { ArtistTile, GenreRow, RangePicker, SectionHeader, TrackRow } from '@/components/stats-ui';
-import { authClient } from '@/lib/auth-client';
-import type { TimeRange } from '@/lib/backend';
 import { colors, type } from '@/lib/theme';
 import { useSpotifyData } from '@/providers/spotify-data';
 
 export default function HomeScreen() {
-  const { data, error, isLoading, isSignedIn, name, refresh } = useSpotifyData();
-  const [range, setRange] = useState<TimeRange>('short_term');
+  const { avatarUrl, data, error, isLoading, isSignedIn, name, range, refresh, setRange } = useSpotifyData();
   const stats = data[range];
 
   if (isLoading && !stats) return <LoadingState />;
@@ -36,15 +32,13 @@ export default function HomeScreen() {
               <View style={styles.brandIcon}><Text style={styles.brandNote}>♫</Text></View>
               <Text style={styles.brand}>SpotiStats</Text>
             </View>
-            <Pressable accessibilityLabel="Sign out" onPress={() => authClient.signOut()} style={styles.avatar}>
-              <Text style={styles.avatarText}>{initials || 'SS'}</Text>
-            </Pressable>
+            {avatarUrl ? <Image source={avatarUrl} contentFit="cover" style={styles.avatar} /> : <View style={styles.avatar}><Text style={styles.avatarText}>{initials || 'SS'}</Text></View>}
           </View>
 
           <View style={styles.greeting}>
             <Text style={styles.eyebrow}>YOUR LISTENING, DECODED</Text>
             <Text style={styles.title}>Made for {name.split(' ')[0]}</Text>
-            <RangePicker value={range} onChange={setRange} />
+            <RangePicker fullWidth value={range} onChange={setRange} />
           </View>
 
           <View style={styles.auraCard}>
