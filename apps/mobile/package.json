@@ -49,6 +49,7 @@
     "build": "expo export --platform all",
     "package:android": "./scripts/package-android.sh",
     "package:ios": "./scripts/package-ios.sh",
+    "package:ios:ipa": "./scripts/package-ios-ipa.sh",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit"
   },

@@ -15,6 +15,7 @@
     "build:mobile": "pnpm --filter @spotistats/mobile build",
     "package:android": "pnpm --filter @spotistats/mobile package:android",
     "package:ios": "pnpm --filter @spotistats/mobile package:ios",
+    "package:ios:ipa": "pnpm --filter @spotistats/mobile package:ios:ipa",
     "build:ci": "pnpm --filter @spotistats/web build:ci",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck"

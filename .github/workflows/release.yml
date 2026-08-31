@@ -91,14 +91,21 @@ jobs:
       - name: Package iOS Simulator app
         run: pnpm package:ios
 
-      - name: Stage iOS Simulator artifact
-        run: cp apps/mobile/dist/SpotiStats-ios-simulator.app.zip "SpotiStats-${GITHUB_REF_NAME}-ios-simulator.app.zip"
+      - name: Package unsigned iOS IPA
+        run: pnpm package:ios:ipa
 
-      - name: Upload iOS Simulator artifact
+      - name: Stage iOS artifacts
+        run: |
+          cp apps/mobile/dist/SpotiStats-ios-simulator.app.zip "SpotiStats-${GITHUB_REF_NAME}-ios-simulator.app.zip"
+          cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${GITHUB_REF_NAME}-ios-unsigned.ipa"
+
+      - name: Upload iOS artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ios-simulator-release
-          path: SpotiStats-${{ github.ref_name }}-ios-simulator.app.zip
+          name: ios-release
+          path: |
+            SpotiStats-${{ github.ref_name }}-ios-simulator.app.zip
+            SpotiStats-${{ github.ref_name }}-ios-unsigned.ipa
           if-no-files-found: error
 
   release:
