@@ -1,0 +1,128 @@
+name: Mobile release
+
+on:
+  push:
+    tags:
+      - "v.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mobile-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  EXPO_PUBLIC_CONVEX_URL: ${{ vars.EXPO_PUBLIC_CONVEX_URL }}
+  EXPO_PUBLIC_AUTH_URL: ${{ vars.EXPO_PUBLIC_AUTH_URL }}
+
+jobs:
+  android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Validate release configuration
+        run: |
+          test -n "$EXPO_PUBLIC_CONVEX_URL" || { echo "Missing repository variable EXPO_PUBLIC_CONVEX_URL"; exit 1; }
+          test -n "$EXPO_PUBLIC_AUTH_URL" || { echo "Missing repository variable EXPO_PUBLIC_AUTH_URL"; exit 1; }
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Package Android app
+        run: pnpm package:android
+
+      - name: Stage Android artifact
+        run: cp apps/mobile/dist/SpotiStats-android.apk "SpotiStats-${GITHUB_REF_NAME}-android.apk"
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: SpotiStats-${{ github.ref_name }}-android.apk
+          if-no-files-found: error
+
+  ios-simulator:
+    name: Build iOS Simulator app
+    runs-on: macos-15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+
+      - name: Validate release configuration
+        run: |
+          test -n "$EXPO_PUBLIC_CONVEX_URL" || { echo "Missing repository variable EXPO_PUBLIC_CONVEX_URL"; exit 1; }
+          test -n "$EXPO_PUBLIC_AUTH_URL" || { echo "Missing repository variable EXPO_PUBLIC_AUTH_URL"; exit 1; }
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Package iOS Simulator app
+        run: pnpm package:ios
+
+      - name: Package unsigned iOS IPA
+        run: pnpm package:ios:ipa
+
+      - name: Stage iOS artifacts
+        run: |
+          cp apps/mobile/dist/SpotiStats-ios-simulator.app.zip "SpotiStats-${GITHUB_REF_NAME}-ios-simulator.app.zip"
+          cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${GITHUB_REF_NAME}-ios-unsigned.ipa"
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release
+          path: |
+            SpotiStats-${{ github.ref_name }}-ios-simulator.app.zip
+            SpotiStats-${{ github.ref_name }}-ios-unsigned.ipa
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    needs: [android, ios-simulator]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download mobile artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-release"
+          merge-multiple: true
+          path: release-artifacts
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true
