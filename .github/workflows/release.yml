@@ -1,0 +1,147 @@
+name: Mobile release
+
+on:
+  push:
+    tags:
+      - "v.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mobile-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  EXPO_PUBLIC_CONVEX_URL: ${{ vars.EXPO_PUBLIC_CONVEX_URL }}
+  EXPO_PUBLIC_AUTH_URL: ${{ vars.EXPO_PUBLIC_AUTH_URL }}
+
+jobs:
+  android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Validate release configuration
+        run: |
+          test -n "$EXPO_PUBLIC_CONVEX_URL" || { echo "Missing repository variable EXPO_PUBLIC_CONVEX_URL"; exit 1; }
+          test -n "$EXPO_PUBLIC_AUTH_URL" || { echo "Missing repository variable EXPO_PUBLIC_AUTH_URL"; exit 1; }
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Android project
+        working-directory: apps/mobile
+        run: pnpm exec expo prebuild --platform android --clean
+        env:
+          CI: "1"
+
+      - name: Build release APK
+        working-directory: apps/mobile/android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Stage Android artifact
+        run: cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk "SpotiStats-${GITHUB_REF_NAME}-android.apk"
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: SpotiStats-${{ github.ref_name }}-android.apk
+          if-no-files-found: error
+
+  ios-simulator:
+    name: Build iOS Simulator app
+    runs-on: macos-15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+
+      - name: Validate release configuration
+        run: |
+          test -n "$EXPO_PUBLIC_CONVEX_URL" || { echo "Missing repository variable EXPO_PUBLIC_CONVEX_URL"; exit 1; }
+          test -n "$EXPO_PUBLIC_AUTH_URL" || { echo "Missing repository variable EXPO_PUBLIC_AUTH_URL"; exit 1; }
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate iOS project
+        working-directory: apps/mobile
+        run: pnpm exec expo prebuild --platform ios --clean
+        env:
+          CI: "1"
+
+      - name: Build iOS Simulator app
+        working-directory: apps/mobile
+        run: |
+          xcodebuild \
+            -workspace ios/SpotiStats.xcworkspace \
+            -scheme SpotiStats \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -derivedDataPath build/ios-simulator \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Stage iOS Simulator artifact
+        working-directory: apps/mobile
+        run: |
+          app_path=$(find build/ios-simulator/Build/Products/Release-iphonesimulator -maxdepth 1 -name '*.app' -print -quit)
+          test -n "$app_path" || { echo "iOS Simulator app was not produced"; exit 1; }
+          ditto -c -k --sequesterRsrc --keepParent "$app_path" "../../SpotiStats-${GITHUB_REF_NAME}-ios-simulator.app.zip"
+
+      - name: Upload iOS Simulator artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-release
+          path: SpotiStats-${{ github.ref_name }}-ios-simulator.app.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    needs: [android, ios-simulator]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download mobile artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-release"
+          merge-multiple: true
+          path: release-artifacts
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true
