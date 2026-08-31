@@ -1,7 +1,7 @@
 {
   "name": "@spotistats/mobile",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "dependencies": {
     "@better-auth/expo": "1.6.30",
     "@convex-dev/better-auth": "^0.12.5",
