@@ -2,7 +2,8 @@ import { Image } from 'expo-image';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ErrorState, LoadingState, SignedOutState } from '@/components/spotify-state';
+import { SkeletonLoader } from '@/components/skeleton-loader';
+import { ErrorState, SignedOutState } from '@/components/spotify-state';
 import { ArtistTile, GenreRow, RangePicker, SectionHeader, TrackRow } from '@/components/stats-ui';
 import { colors, type } from '@/lib/theme';
 import { useSpotifyData } from '@/providers/spotify-data';
@@ -11,10 +12,10 @@ export default function HomeScreen() {
   const { avatarUrl, data, error, isLoading, isSignedIn, name, range, refresh, setRange } = useSpotifyData();
   const stats = data[range];
 
-  if (isLoading && !stats) return <LoadingState />;
+  if (isLoading && !stats) return <SkeletonLoader variant="home" />;
   if (!isSignedIn) return <SignedOutState />;
   if (error && !stats) return <ErrorState message={error} retry={() => void refresh()} />;
-  if (!stats) return <LoadingState />;
+  if (!stats) return <SkeletonLoader variant="home" />;
 
   const topArtist = stats.artists[0];
   const topTrack = stats.tracks[0];

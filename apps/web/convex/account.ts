@@ -29,7 +29,8 @@ type BetterAuthAccount = {
 };
 
 type BetterAuthSession = {
-  id: string;
+  id?: string;
+  _id?: string;
   createdAt: number;
   updatedAt: number;
   expiresAt: number;
@@ -46,6 +47,10 @@ type SessionLocationResult = {
   ip: string;
   locationLabel: string | null;
 };
+
+function getSessionId(session: BetterAuthSession): string | null {
+  return session.id ?? session._id ?? null;
+}
 
 function formatDeviceLabel(userAgent: string | null | undefined): string {
   if (!userAgent) return "Unknown device";
@@ -225,16 +230,20 @@ export const getAccountPageData = query({
     }
 
     const normalizedSessions = sessions.page
-      .map((session) => ({
-        id: session.id,
-        isCurrent: session.id === identity.sessionId,
+      .flatMap((session) => {
+        const id = getSessionId(session);
+        if (!id) return [];
+        return [{
+        id,
+        isCurrent: id === identity.sessionId,
         createdAt: session.createdAt,
         updatedAt: session.updatedAt,
         expiresAt: session.expiresAt,
         ipAddressMasked: session.ipAddress ?? null,
         userAgent: session.userAgent ?? null,
         deviceLabel: formatDeviceLabel(session.userAgent),
-      }))
+        }];
+      })
       .sort((left, right) => {
         if (left.isCurrent !== right.isCurrent) {
           return left.isCurrent ? -1 : 1;
@@ -315,7 +324,8 @@ export const revokeOtherSessions = mutation({
     const sessions = await getUserSessions(ctx, identity.subject);
 
     const otherSessionIds = sessions.page
-      .map((session) => session.id)
+      .map(getSessionId)
+      .filter((sessionId): sessionId is string => sessionId !== null)
       .filter((sessionId) => sessionId !== identity.sessionId);
 
     if (otherSessionIds.length === 0) {

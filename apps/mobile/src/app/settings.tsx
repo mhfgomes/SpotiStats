@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { LoadingState, SignedOutState } from '@/components/spotify-state';
+import { SkeletonLoader } from '@/components/skeleton-loader';
+import { SignedOutState } from '@/components/spotify-state';
 import { authClient } from '@/lib/auth-client';
 import { getAccountPageData, revokeOtherSessions, revokeSession } from '@/lib/backend';
 import { colors, type } from '@/lib/theme';
@@ -22,7 +23,7 @@ export default function SettingsScreen() {
   const [feedback, setFeedback] = useState<Feedback>(null);
 
   if (!isSignedIn) return <SignedOutState />;
-  if (account === undefined) return <LoadingState />;
+  if (account === undefined) return <SkeletonLoader variant="settings" />;
 
   const user = account.authUser;
   const initials = (user?.name ?? 'Listener').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
@@ -122,8 +123,8 @@ export default function SettingsScreen() {
 
           <View style={styles.sectionHeading}><SectionTitle title={`Active sessions · ${account.sessions.length}`} />{otherSessions.length ? <Pressable onPress={signOutOthers}><Text style={styles.sectionAction}>SIGN OUT OTHERS</Text></Pressable> : null}</View>
           <View style={styles.cardFlush}>
-            {account.sessions.map((session) => (
-              <View key={session.id} style={styles.sessionRow}>
+            {account.sessions.map((session, index) => (
+              <View key={`${session.id || 'session'}-${index}`} style={styles.sessionRow}>
                 <View style={styles.deviceIcon}><Text style={styles.deviceMark}>▣</Text></View>
                 <View style={styles.profileCopy}>
                   <View style={styles.connectedLine}><Text numberOfLines={1} style={styles.sessionName}>{session.deviceLabel}</Text>{session.isCurrent ? <Text style={styles.current}>THIS DEVICE</Text> : null}</View>

@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ErrorState, LoadingState, SignedOutState } from '@/components/spotify-state';
+import { SkeletonLoader } from '@/components/skeleton-loader';
+import { ErrorState, SignedOutState } from '@/components/spotify-state';
 import { ArtistRow, GenreRow, RangePicker, TrackRow } from '@/components/stats-ui';
 import type { RecentlyPlayedItem, SpotifyTopData } from '@/lib/backend';
 import { colors, type } from '@/lib/theme';
@@ -19,10 +20,10 @@ export default function LibraryScreen() {
   const [view, setView] = useState<ViewKey>('tracks');
   const stats = data[range];
 
-  if (isLoading && !stats) return <LoadingState />;
+  if (isLoading && !stats) return <SkeletonLoader variant="library" />;
   if (!isSignedIn) return <SignedOutState />;
   if (error && !stats) return <ErrorState message={error} retry={() => void refresh()} />;
-  if (!stats) return <LoadingState />;
+  if (!stats) return <SkeletonLoader variant="library" />;
 
   return (
     <View style={styles.screen}>

@@ -1,15 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { authClient } from '@/lib/auth-client';
-
-export function LoadingState() {
-  return (
-    <View style={styles.screen}>
-      <ActivityIndicator color="#1ED760" />
-      <Text style={styles.kicker}>READING YOUR LISTENING HISTORY</Text>
-    </View>
-  );
-}
 
 export function SignedOutState() {
   const connect = async () => {
