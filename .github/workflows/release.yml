@@ -34,7 +34,7 @@ jobs:
           ref: ${{ env.RELEASE_TAG }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -85,7 +85,7 @@ jobs:
           ref: ${{ env.RELEASE_TAG }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
