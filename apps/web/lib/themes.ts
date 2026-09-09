@@ -14,6 +14,12 @@ export const CARD_THEMES = {
     divider: "rgba(255,255,255,0.08)", footer: "rgba(248,250,252,0.28)",
     track: "rgba(255,255,255,0.04)",
   },
+  t3: {
+    bg: "linear-gradient(135deg, #1f1a24 0%, #29232d 100%)",
+    text: "#f9f8fb",   sub: "#e7d0dd", accent: "#a3004c",
+    divider: "rgba(249,248,251,0.12)", footer: "rgba(231,208,221,0.40)",
+    track: "rgba(249,248,251,0.06)",
+  },
   sunset: {
     bg: "linear-gradient(135deg, #f7971e 0%, #ff416c 100%)",
     text: "#ffffff",   sub: "rgba(255,255,255,0.62)", accent: "#fff2cc",
@@ -65,6 +71,7 @@ export type CardTheme = (typeof CARD_THEMES)[CardThemeKey];
 export const THEME_SWATCHES = [
   { id: "ocean"    as CardThemeKey, label: "Ocean",    dot: "#fbd38d", bg1: "#1e3c72", bg2: "#2a5298" },
   { id: "midnight" as CardThemeKey, label: "Midnight", dot: "#a5b4fc", bg1: "#0f172a", bg2: "#1f2937" },
+  { id: "t3"       as CardThemeKey, label: "T3",       dot: "#a3004c", bg1: "#1f1a24", bg2: "#29232d" },
   { id: "sunset"   as CardThemeKey, label: "Sunset",   dot: "#fff2cc", bg1: "#f7971e", bg2: "#ff416c" },
   { id: "lavender" as CardThemeKey, label: "Lavender", dot: "#fde047", bg1: "#8b5cf6", bg2: "#ec4899" },
   { id: "forest"   as CardThemeKey, label: "Forest",   dot: "#facc15", bg1: "#0f766e", bg2: "#22c55e" },
