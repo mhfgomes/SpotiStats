@@ -69,7 +69,7 @@ jobs:
         run: cp apps/mobile/dist/SpotiStats-android.apk "SpotiStats-${RELEASE_TAG}-android.apk"
 
       - name: Upload Android artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-release
           path: SpotiStats-${{ env.RELEASE_TAG }}-android.apk
@@ -115,7 +115,7 @@ jobs:
         run: cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${RELEASE_TAG}-ios-unsigned.ipa"
 
       - name: Upload unsigned iOS artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ios-unsigned-release
           path: SpotiStats-${{ env.RELEASE_TAG }}-ios-unsigned.ipa
