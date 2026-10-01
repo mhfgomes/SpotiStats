@@ -2,6 +2,11 @@ packages:
   - apps/*
   - packages/*
 
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: false
+
+# Xcode uses the CommonJS v4 API; uuid 12+ removes CommonJS support.
+overrides:
+  "xcode>uuid": 11.1.1
