@@ -74,6 +74,7 @@ jobs:
           name: android-release
           path: SpotiStats-${{ env.RELEASE_TAG }}-android.apk
           if-no-files-found: error
+          retention-days: 7
 
   ios-unsigned:
     name: Build unsigned iOS IPA
@@ -120,6 +121,7 @@ jobs:
           name: ios-unsigned-release
           path: SpotiStats-${{ env.RELEASE_TAG }}-ios-unsigned.ipa
           if-no-files-found: error
+          retention-days: 7
 
   release:
     name: Publish GitHub release
