@@ -13,7 +13,7 @@ apps/
 ## Requirements
 
 - Node.js 22.13 or newer
-- pnpm 10 or newer
+- pnpm 12.8.1 or newer
 - A Spotify developer application
 
 ## Install
@@ -42,6 +42,15 @@ pnpm lint
 pnpm typecheck
 pnpm build:ci
 ```
+
+## Dependency compatibility
+
+Use `pnpm --filter @spotistats/mobile exec expo install --check` and `pnpm peers check` when updating dependencies.
+
+- Expo SDK 57 requires React 19.2.3, React Native 0.86.3, and its supported native-library versions. Keep these aligned with Expo's compatibility check.
+- `@convex-dev/better-auth` 0.12.5 requires Better Auth below 1.7. Keep `better-auth`, `@better-auth/core`, and `@better-auth/expo` on the same supported release.
+- The current React ESLint plugin supports ESLint 9, and the TypeScript ESLint parser supports TypeScript below 6.1. Keep ESLint 9.39.5 and TypeScript 6.0.3 until their plugins support newer majors.
+- The Xcode tooling's `uuid` dependency is overridden to 11.1.1 to include security fixes while preserving CommonJS support. Expo Router's `query-string` still uses a vulnerable `decode-uri-component`; the patched decoder is ESM and requires an upstream migration.
 
 ## Features
 
