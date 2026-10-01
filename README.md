@@ -47,8 +47,14 @@ pnpm build:ci
 
 The Mobile release workflow builds Android and iOS in parallel. Mobile changes on
 `main` populate the Gradle and iOS compiler caches that subsequent release tags
-can restore. Pull requests run the native builds with those caches read-only;
-only `v*` tags and manual release dispatches upload artifacts and publish releases.
+can restore. Pull requests touching the mobile app, shared dependency files, or
+the mobile workflows run native test builds with those caches read-only. Both
+the Android APK and unsigned iOS IPA are uploaded and linked in a PR comment,
+which is updated after successful builds of new commits. Downloads require
+GitHub sign-in and expire after seven days; the iOS IPA requires signing before
+installation on a device. Fork PR comments use a separate trusted workflow that
+becomes active once it exists on the default branch. Only `v*` tags and manual
+release dispatches publish releases.
 The first build after merging these workflow changes will populate cold caches.
 
 Android APKs target `arm64-v8a` by default, supporting modern 64-bit ARM phones.
