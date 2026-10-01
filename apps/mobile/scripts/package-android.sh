@@ -3,12 +3,14 @@ set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 artifact_dir="$project_dir/dist"
+architectures="${ANDROID_ARCHITECTURES:-arm64-v8a}"
 
 cd "$project_dir"
 CI=1 pnpm exec expo prebuild --platform android --clean
 
 cd "$project_dir/android"
-./gradlew assembleRelease --no-daemon
+./gradlew assembleRelease --no-daemon --build-cache --parallel \
+  "-PreactNativeArchitectures=$architectures"
 
 mkdir -p "$artifact_dir"
 cp "$project_dir/android/app/build/outputs/apk/release/app-release.apk" \
