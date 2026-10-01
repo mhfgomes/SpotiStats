@@ -28,6 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { THEME_SWATCHES } from "@/lib/themes";
 import type { CardThemeKey } from "@/lib/themes";
+import { FONT_OPTIONS, DEFAULT_FONT, type CardFontKey } from "@/lib/fonts";
 
 const BANNER_META = {
   classic: {
@@ -74,6 +75,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   const user = useQuery(api.users.getSpotifyUser);
 
   const [theme, setTheme] = useState<CardThemeKey>("ocean");
+  const [font, setFont] = useState<CardFontKey>(DEFAULT_FONT);
   const [range, setRange] = useState<RangeId>("short_term");
   const [previewKey, setPreviewKey] = useState(0);
   const [copied, setCopied] = useState<"url" | "html" | "md" | null>(null);
@@ -83,7 +85,7 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
   const meta = BANNER_META[type];
 
   const cardUrl = user
-    ? `${baseUrl}/api/card/${user._id}?type=${type}&theme=${theme}&range=${range}`
+    ? `${baseUrl}/api/card/${user._id}?type=${type}&theme=${theme}&range=${range}&font=${font}`
     : null;
   const previewSrc = cardUrl ? `${cardUrl}&_v=${previewKey}` : null;
 
@@ -173,6 +175,49 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
                         {swatch.label}
                       </p>
                     </div>
+                  </Label>
+                ))}
+              </RadioGroup>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle>Typography</CardTitle>
+              <CardDescription>Choose the font style for this card.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RadioGroup
+                value={font}
+                onValueChange={(value) => setFont(value as CardFontKey)}
+                className="gap-2"
+              >
+                {FONT_OPTIONS.map((item) => (
+                  <Label
+                    key={item.id}
+                    htmlFor={`font-${type}-${item.id}`}
+                    className={cn(
+                      "flex cursor-pointer items-center justify-between rounded-xl border px-3 py-2.5 transition-colors",
+                      font === item.id
+                        ? "border-primary/60 bg-primary/10 text-white"
+                        : "border-white/8 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-white"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <RadioGroupItem
+                        id={`font-${type}-${item.id}`}
+                        value={item.id}
+                      />
+                      <span
+                        className="text-sm font-medium"
+                        style={{ fontFamily: item.family }}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground/70">
+                      {item.description}
+                    </span>
                   </Label>
                 ))}
               </RadioGroup>

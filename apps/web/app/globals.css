@@ -91,3 +91,28 @@
     background-color: rgb(255 255 255 / 0.1);
   }
 }
+
+
+@font-face {
+  font-family: 'Excalifont';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/Excalifont-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFWNOITd.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/geistmono/v6/or3nQ6H-1_WfwkMZI_qYFrcdmhHkjko.woff2') format('woff2');
+}
