@@ -2,6 +2,8 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { CARD_THEMES } from "@/lib/themes";
+import { getCardFont, type CardFontDef } from "@/lib/fonts";
+import { getFontCss } from "@/lib/fonts-server";
 import type { CardTheme, CardThemeKey } from "@/lib/themes";
 import type { LiveTopArtist, LiveTopGenre, LiveTopTrack } from "@/lib/spotify-live";
 
@@ -53,8 +55,15 @@ function parseBgColors(css: string): { c1: string; c2: string } {
  * The background uses a diagonal linearGradient derived from theme.bg,
  * overlaid with a dot pattern.
  */
-function svgDoc(w: number, h: number, theme: Theme, body: string): string {
+async function svgDoc(
+  w: number,
+  h: number,
+  theme: Theme,
+  body: string,
+  fontDef: CardFontDef
+): Promise<string> {
   const { c1, c2 } = parseBgColors(theme.bg);
+  const fontStyle = await getFontCss(fontDef);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
@@ -66,11 +75,11 @@ function svgDoc(w: number, h: number, theme: Theme, body: string): string {
     </pattern>
     <clipPath id="card-clip">
       <rect width="${w}" height="${h}" rx="20"/>
-    </clipPath>
+    </clipPath>${fontStyle}
   </defs>
   <rect width="${w}" height="${h}" rx="20" fill="url(#bg)"/>
   <rect width="${w}" height="${h}" rx="20" fill="url(#dots)"/>
-  <g font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" clip-path="url(#card-clip)">
+  <g font-family="${e(fontDef.family)}" clip-path="url(#card-clip)">
     ${body}
   </g>
 </svg>`;
@@ -108,6 +117,7 @@ async function buildClassicCard(
   w: number, h: number,
   user: User, tracks: Track[], artists: Artist[], genres: Genre[],
   theme: Theme, rangeLabel: string, host: string,
+  fontDef: CardFontDef,
 ): Promise<string> {
   const pl = 56, pt = 52, pb = 52;
   const top5 = tracks.slice(0, 5);
@@ -180,7 +190,7 @@ async function buildClassicCard(
   });
 
   body += cardFooter(w, h, pl, pb, theme, host);
-  return svgDoc(w, h, theme, body);
+  return svgDoc(w, h, theme, body, fontDef);
 }
 
 // ─── Tracks Card (1200×630) ───────────────────────────────────────────────────
@@ -189,6 +199,7 @@ async function buildTracksCard(
   w: number, h: number,
   user: User, tracks: Track[],
   theme: Theme, rangeLabel: string, host: string,
+  fontDef: CardFontDef,
 ): Promise<string> {
   const pl = 56, pt = 52, pb = 52;
   const col1 = tracks.slice(0, 4);
@@ -229,7 +240,7 @@ async function buildTracksCard(
   col2.forEach((track, i) => { body += trackRow(track, i + 4, i, col2X, imgs[4 + i]); });
 
   body += cardFooter(w, h, pl, pb, theme, host);
-  return svgDoc(w, h, theme, body);
+  return svgDoc(w, h, theme, body, fontDef);
 }
 
 // ─── Artists Card (1200×630) ──────────────────────────────────────────────────
@@ -238,6 +249,7 @@ async function buildArtistsCard(
   w: number, h: number,
   user: User, artists: Artist[],
   theme: Theme, rangeLabel: string, host: string,
+  fontDef: CardFontDef,
 ): Promise<string> {
   const pl = 56, pt = 52, pb = 52;
   const top5 = artists.slice(0, 5);
@@ -281,7 +293,7 @@ async function buildArtistsCard(
   });
 
   body += cardFooter(w, h, pl, pb, theme, host);
-  return svgDoc(w, h, theme, body);
+  return svgDoc(w, h, theme, body, fontDef);
 }
 
 // ─── Compact Card (600×600) ───────────────────────────────────────────────────
@@ -290,6 +302,7 @@ async function buildCompactCard(
   w: number, h: number,
   user: User, tracks: Track[], artists: Artist[], genres: Genre[],
   theme: Theme, rangeLabel: string, host: string,
+  fontDef: CardFontDef,
 ): Promise<string> {
   const p = 36;
   const top3 = tracks.slice(0, 3);
@@ -366,7 +379,7 @@ async function buildCompactCard(
   <text x="${p}" y="${fty + 18}" dominant-baseline="central" font-size="13" font-weight="700" fill="${theme.accent}">${e(trunc(topGenre, 20))}</text>
   <text x="${w - p}" y="${fty + 9}" text-anchor="end" dominant-baseline="central" font-size="11" fill="${theme.footer}">${e(host)}</text>`;
 
-  return svgDoc(w, h, theme, body);
+  return svgDoc(w, h, theme, body, fontDef);
 }
 
 // ─── Route ────────────────────────────────────────────────────────────────────
@@ -418,19 +431,22 @@ export async function GET(
 
   const { tracks, artists, genres, user } = cardData;
 
+  const fontKey = searchParams.get("font");
+  const fontDef = getCardFont(fontKey);
+
   let svg: string;
   switch (type) {
     case "tracks":
-      svg = await buildTracksCard(width, height, user, tracks, theme, rangeLabel, host);
+      svg = await buildTracksCard(width, height, user, tracks, theme, rangeLabel, host, fontDef);
       break;
     case "artists":
-      svg = await buildArtistsCard(width, height, user, artists, theme, rangeLabel, host);
+      svg = await buildArtistsCard(width, height, user, artists, theme, rangeLabel, host, fontDef);
       break;
     case "compact":
-      svg = await buildCompactCard(width, height, user, tracks, artists, genres, theme, rangeLabel, host);
+      svg = await buildCompactCard(width, height, user, tracks, artists, genres, theme, rangeLabel, host, fontDef);
       break;
     default:
-      svg = await buildClassicCard(width, height, user, tracks, artists, genres, theme, rangeLabel, host);
+      svg = await buildClassicCard(width, height, user, tracks, artists, genres, theme, rangeLabel, host, fontDef);
   }
 
   return new Response(svg, {
