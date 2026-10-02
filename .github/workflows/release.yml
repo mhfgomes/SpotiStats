@@ -2,8 +2,24 @@ name: Mobile release
 
 on:
   push:
+    branches: [main, master]
     tags:
       - "v*"
+    paths:
+      - "apps/mobile/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/release.yml"
+      - ".github/workflows/mobile-pr-artifacts.yml"
+  pull_request:
+    paths:
+      - "apps/mobile/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/release.yml"
+      - ".github/workflows/mobile-pr-artifacts.yml"
   workflow_dispatch:
     inputs:
       tag:
@@ -12,16 +28,18 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: mobile-release-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   EXPO_PUBLIC_CONVEX_URL: ${{ vars.EXPO_PUBLIC_CONVEX_URL }}
   EXPO_PUBLIC_AUTH_URL: ${{ vars.EXPO_PUBLIC_AUTH_URL }}
   RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+  ARTIFACT_LABEL: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || inputs.tag || github.ref_name }}
+  BUILD_REF: ${{ inputs.tag || github.ref }}
 
 jobs:
   android:
@@ -31,7 +49,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ env.BUILD_REF }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -50,6 +68,9 @@ jobs:
 
       - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v6
+        with:
+          # Default-branch builds seed the cache shared with release tags.
+          cache-read-only: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
@@ -66,24 +87,32 @@ jobs:
         run: pnpm package:android
 
       - name: Stage Android artifact
-        run: cp apps/mobile/dist/SpotiStats-android.apk "SpotiStats-${RELEASE_TAG}-android.apk"
+        if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/')
+        run: cp apps/mobile/dist/SpotiStats-android.apk "SpotiStats-${ARTIFACT_LABEL}-android.apk"
 
       - name: Upload Android artifact
+        if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v7
         with:
-          name: android-release
-          path: SpotiStats-${{ env.RELEASE_TAG }}-android.apk
+          name: ${{ github.event_name == 'pull_request' && format('android-pr-{0}', github.event.pull_request.number) || 'android-release' }}
+          path: SpotiStats-${{ env.ARTIFACT_LABEL }}-android.apk
           if-no-files-found: error
           retention-days: 7
 
   ios-unsigned:
     name: Build unsigned iOS IPA
     runs-on: macos-26
+    env:
+      USE_CCACHE: "1"
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_COMPILERCHECK: content
+      CCACHE_MAXSIZE: 500M
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ env.BUILD_REF }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -101,6 +130,24 @@ jobs:
           key: cocoapods-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: cocoapods-${{ runner.os }}-
 
+      - name: Set up compiler cache
+        run: |
+          command -v ccache || brew install ccache
+          echo "xcode=$(xcodebuild -version | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
+
+      - name: Restore iOS compiler cache
+        id: ios-ccache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ios-ccache-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.xcode }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ios-ccache-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.xcode }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            ios-ccache-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.xcode }}-
+
+      - name: Reset compiler cache statistics
+        run: ccache --zero-stats
+
       - name: Validate release configuration
         run: |
           test -n "$EXPO_PUBLIC_CONVEX_URL" || { echo "Missing repository variable EXPO_PUBLIC_CONVEX_URL"; exit 1; }
@@ -112,21 +159,48 @@ jobs:
       - name: Package unsigned iOS IPA
         run: pnpm package:ios:ipa
 
+      - name: Report compiler cache statistics
+        if: always()
+        run: ccache --show-stats
+
+      - name: Save iOS compiler cache
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && steps.ios-ccache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ steps.ios-ccache.outputs.cache-primary-key }}
+
       - name: Stage unsigned iOS artifact
-        run: cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${RELEASE_TAG}-ios-unsigned.ipa"
+        if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/')
+        run: cp apps/mobile/dist/SpotiStats-ios-unsigned.ipa "SpotiStats-${ARTIFACT_LABEL}-ios-unsigned.ipa"
 
       - name: Upload unsigned iOS artifact
+        if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v7
         with:
-          name: ios-unsigned-release
-          path: SpotiStats-${{ env.RELEASE_TAG }}-ios-unsigned.ipa
+          name: ${{ github.event_name == 'pull_request' && format('ios-unsigned-pr-{0}', github.event.pull_request.number) || 'ios-unsigned-release' }}
+          path: SpotiStats-${{ env.ARTIFACT_LABEL }}-ios-unsigned.ipa
           if-no-files-found: error
           retention-days: 7
+
+  pr-artifacts:
+    name: Attach mobile builds to PR
+    needs: [android, ios-unsigned]
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      actions: read
+      pull-requests: write
+    uses: ./.github/workflows/mobile-pr-artifacts.yml
+    with:
+      run-id: ${{ github.run_id }}
 
   release:
     name: Publish GitHub release
     needs: [android, ios-unsigned]
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download mobile artifacts
         uses: actions/download-artifact@v8

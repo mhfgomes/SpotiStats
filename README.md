@@ -43,6 +43,34 @@ pnpm typecheck
 pnpm build:ci
 ```
 
+## Mobile release builds
+
+The Mobile release workflow builds Android and iOS in parallel. Mobile changes on
+`main` populate the Gradle and iOS compiler caches that subsequent release tags
+can restore. Pull requests touching the mobile app, shared dependency files, or
+the mobile workflows run native test builds with those caches read-only. Both
+the Android APK and unsigned iOS IPA are uploaded and linked in a PR comment,
+which is updated after successful builds of new commits. Downloads require
+GitHub sign-in and expire after seven days; the iOS IPA requires signing before
+installation on a device. Fork PR comments use a separate trusted workflow that
+becomes active once it exists on the default branch. Only `v*` tags and manual
+release dispatches publish releases.
+The first build after merging these workflow changes will populate cold caches.
+
+Android APKs target `arm64-v8a` by default, supporting modern 64-bit ARM phones.
+They do not support 32-bit ARM devices or x86 emulators. To package additional
+architectures locally, override the default:
+
+```bash
+ANDROID_ARCHITECTURES=arm64-v8a,armeabi-v7a,x86,x86_64 pnpm package:android
+```
+
+Android builds enable Gradle task-output caching and parallel execution. iOS
+builds enable React Native's ccache support before CocoaPods installation, cache
+compiler outputs by runner architecture and Xcode version, and report cache hit
+statistics in the workflow logs. Native projects are still generated from the
+current app configuration rather than restored from a cache.
+
 ## Dependency compatibility
 
 Use `pnpm --filter @spotistats/mobile exec expo install --check` and `pnpm peers check` when updating dependencies.

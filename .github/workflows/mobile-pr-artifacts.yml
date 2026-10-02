@@ -1,0 +1,74 @@
+name: Attach mobile PR builds
+
+on:
+  workflow_call:
+    inputs:
+      run-id:
+        required: true
+        type: string
+  # Fork PRs have read-only tokens. Comment from the default-branch workflow
+  # after their build finishes, without checking out or executing PR code.
+  workflow_run:
+    workflows: [Mobile release]
+    types: [completed]
+
+permissions:
+  actions: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.event == 'pull_request' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name != github.repository)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Link test builds in PR comment
+        uses: actions/github-script@v8
+        env:
+          BUILD_RUN_ID: ${{ inputs.run-id || github.event.workflow_run.id }}
+        with:
+          script: |
+            const repo = context.repo;
+            const run_id = Number(process.env.BUILD_RUN_ID);
+            const { data: run } = await github.rest.actions.getWorkflowRun({ ...repo, run_id });
+            if (run.event !== 'pull_request') return;
+
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...repo, run_id, per_page: 100,
+            });
+            const android = artifacts.find(a => /^android-pr-\d+$/.test(a.name) && !a.expired);
+            if (!android) return;
+            const issue_number = Number(android.name.match(/\d+$/)[0]);
+            const ios = artifacts.find(a => a.name === `ios-unsigned-pr-${issue_number}` && !a.expired);
+            if (!ios) return;
+
+            const { data: pr } = await github.rest.pulls.get({ ...repo, pull_number: issue_number });
+            // Ignore stale runs and verify the artifact's PR belongs to this run.
+            if (pr.state !== 'open' || pr.head.sha !== run.head_sha ||
+                pr.head.repo?.full_name !== run.head_repository.full_name) return;
+
+            const marker = '<!-- spotistats-mobile-test-builds -->';
+            const url = a => `${context.serverUrl}/${repo.owner}/${repo.repo}/actions/runs/${run_id}/artifacts/${a.id}`;
+            const body = [
+              marker,
+              `Mobile test builds for \`${run.head_sha.slice(0, 7)}\`:`,
+              '',
+              `- [Android APK (ARM64)](${url(android)})`,
+              `- [iOS IPA (unsigned)](${url(ios)})`,
+              '',
+              'Downloads require GitHub sign-in and expire after 7 days. The iOS IPA requires signing before installation on a device.',
+              '',
+              `[Build logs](${run.html_url})`,
+            ].join('\n');
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...repo, issue_number, per_page: 100,
+            });
+            const existing = comments.find(c => c.user?.login === 'github-actions[bot]' && c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ ...repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ ...repo, issue_number, body });
+            }
