@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Link test builds in PR comment
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           BUILD_RUN_ID: ${{ inputs.run-id || github.event.workflow_run.id }}
         with:
