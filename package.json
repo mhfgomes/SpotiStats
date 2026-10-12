@@ -2,10 +2,10 @@
   "name": "spotistats",
   "version": "0.1.2",
   "private": true,
-  "packageManager": "pnpm@12.8.1",
+  "packageManager": "pnpm@12.11.2",
   "engines": {
     "node": ">=22.13.0",
-    "pnpm": ">=12.8.1"
+    "pnpm": ">=12.11.2"
   },
   "scripts": {
     "dev": "pnpm --filter @spotistats/web dev",
