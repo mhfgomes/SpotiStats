@@ -197,27 +197,27 @@ export function BannerCardPage({ type }: BannerCardPageProps) {
                     key={item.id}
                     htmlFor={`font-${type}-${item.id}`}
                     className={cn(
-                      "flex cursor-pointer items-center justify-between rounded-xl border px-3 py-2.5 transition-colors",
+                      "grid cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors",
                       font === item.id
                         ? "border-primary/60 bg-primary/10 text-white"
                         : "border-white/8 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-white"
                     )}
                   >
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem
-                        id={`font-${type}-${item.id}`}
-                        value={item.id}
-                      />
+                    <RadioGroupItem
+                      id={`font-${type}-${item.id}`}
+                      value={item.id}
+                    />
+                    <div className="flex min-w-0 flex-col items-start gap-1">
                       <span
-                        className="text-sm font-medium"
+                        className="text-sm font-medium leading-snug"
                         style={{ fontFamily: item.family }}
                       >
                         {item.label}
                       </span>
+                      <span className="text-[11px] leading-snug text-muted-foreground/70">
+                        {item.description}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-muted-foreground/70">
-                      {item.description}
-                    </span>
                   </Label>
                 ))}
               </RadioGroup>
