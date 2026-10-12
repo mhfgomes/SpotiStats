@@ -107,8 +107,7 @@ function cardFooter(w: number, h: number, pl: number, pb: number, theme: Theme, 
   return `
   <line x1="${pl}" y1="${lineY}" x2="${w - pl}" y2="${lineY}" stroke="${theme.divider}" stroke-width="1"/>
   <text x="${pl}" y="${ty}" dominant-baseline="central" font-size="12" fill="${theme.footer}">${e(host)}</text>
-  <circle cx="${w - pl - 112}" cy="${ty}" r="3" fill="${theme.accent}"/>
-  <text x="${w - pl - 104}" y="${ty}" dominant-baseline="central" font-size="12" fill="${theme.footer}">Generated with SpotiStats</text>`;
+  <text x="${w - pl}" y="${ty}" text-anchor="end" dominant-baseline="central" font-size="12" fill="${theme.footer}"><tspan font-family="sans-serif" font-size="8" fill="${theme.accent}">&#9679;</tspan><tspan dx="8">Generated with SpotiStats</tspan></text>`;
 }
 
 // ─── Classic Card (1200×630) ──────────────────────────────────────────────────
