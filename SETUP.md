@@ -1,7 +1,7 @@
 # SpotiStats Setup Guide
 
 ## Prerequisites
-- Node.js 22.13+ and pnpm 10+ installed
+- Node.js 22.13+ and pnpm 12.11.2+ installed
 - A Spotify Developer account
 
 ## Step 1 — Spotify Developer App
