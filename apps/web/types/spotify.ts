@@ -20,6 +20,7 @@ export interface SpotifyArtistSimple {
 export interface SpotifyAlbum {
   id: string;
   name: string;
+  album_type?: "album" | "single" | "compilation";
   images: SpotifyImage[];
   uri: string;
   external_urls: SpotifyExternalUrls;
