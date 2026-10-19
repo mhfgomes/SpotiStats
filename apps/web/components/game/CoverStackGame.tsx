@@ -69,15 +69,22 @@ const FALLBACK_COVERS: Cover[] = [
 function SlabView({
   slab,
   cover,
+  loading = false,
   className,
 }: {
   slab: Slab;
   cover: Cover;
+  loading?: boolean;
   className?: string;
 }) {
-  const image = cover.imageUrl
-    ? `url("${cover.imageUrl}")`
-    : "linear-gradient(135deg, #1DB954, #0f5f2d)";
+  const image = loading
+    ? "linear-gradient(#2a2a2a, #2a2a2a)"
+    : cover.imageUrl
+      ? `url("${cover.imageUrl}")`
+      : "linear-gradient(135deg, #1DB954, #0f5f2d)";
+  // Pulse each face rather than the slab: opacity on the 3D container would
+  // flatten it.
+  const pulse = loading ? " animate-pulse" : "";
   // The cover travels with its slab; once trimmed, the remaining piece keeps
   // showing the matching slice of the artwork.
   const art = slab.art ?? slab;
@@ -117,7 +124,7 @@ function SlabView({
       }}
     >
       <div
-        className="absolute inset-0 rounded-[4px]"
+        className={`absolute inset-0 rounded-[4px]${pulse}`}
         style={{
           ...topStyle,
           transform: `translateZ(${HEIGHT}px)`,
@@ -127,7 +134,7 @@ function SlabView({
       />
       {/* Front (+y) face */}
       <div
-        className="absolute left-0 shadow-[inset_0_-1px_0_rgb(255_255_255/0.3)]"
+        className={`absolute left-0 shadow-[inset_0_-1px_0_rgb(255_255_255/0.3)]${pulse}`}
         style={{
           ...frontStyle,
           top: slab.d,
@@ -149,7 +156,7 @@ function SlabView({
         }}
       >
         <div
-          className="absolute left-0 top-0 shadow-[inset_-1px_0_0_rgb(255_255_255/0.25)]"
+          className={`absolute left-0 top-0 shadow-[inset_-1px_0_0_rgb(255_255_255/0.25)]${pulse}`}
           style={{
             ...leftStyle,
             width: HEIGHT,
@@ -516,6 +523,7 @@ export function CoverStackGame() {
                 key={slab.id}
                 slab={slab}
                 cover={coverForLevel(slab.level)}
+                loading={isLoading}
               />
             ))}
             {moving && (
