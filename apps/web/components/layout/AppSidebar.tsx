@@ -16,6 +16,8 @@ import {
   Headphones,
   CreditCard,
   User,
+  Gamepad2,
+  Grid3x3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/layout/sidebar-context";
@@ -44,6 +46,11 @@ const exploreNavItems = [
 
 const shareNavItems = [
   { href: "/stats-card/recap", icon: CreditCard, label: "Recap Card" },
+];
+
+const gameNavItems = [
+  { href: "/cover-stack", icon: Gamepad2, label: "Cover Stack" },
+  { href: "/pixel-reveal", icon: Grid3x3, label: "Album Pixel Reveal" },
 ];
 
 const statsCardItems = [
@@ -281,6 +288,22 @@ export function AppSidebar() {
               </>
             )}
           </div>
+
+          <NavSectionLabel collapsed={collapsed}>Games</NavSectionLabel>
+          {gameNavItems.map(({ href, icon, label }) => {
+            const isActive = pathname === href;
+            return (
+              <SidebarNavLink
+                key={href}
+                href={href}
+                icon={icon}
+                label={label}
+                isActive={isActive}
+                collapsed={collapsed}
+                ariaCurrent={isActive ? "page" : undefined}
+              />
+            );
+          })}
         </nav>
 
         <div

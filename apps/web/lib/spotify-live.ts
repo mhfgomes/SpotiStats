@@ -11,6 +11,7 @@ export interface LiveTopTrack {
   albumName: string;
   albumExternalUrl?: string;
   albumImageUrl?: string;
+  albumType?: "album" | "single" | "compilation";
   artistNames: string[];
   artistSpotifyIds: string[];
   durationMs: number;
@@ -79,6 +80,7 @@ export function mapSpotifyTopTracks(items: SpotifyTrack[]): LiveTopTrack[] {
     albumName: track.album.name,
     albumExternalUrl: track.album.external_urls?.spotify,
     albumImageUrl: track.album.images[0]?.url,
+    albumType: track.album.album_type,
     artistNames: track.artists.map((artist: SpotifyArtistSimple) => artist.name),
     artistSpotifyIds: track.artists.map((artist: SpotifyArtistSimple) => artist.id),
     durationMs: track.duration_ms,
