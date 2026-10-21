@@ -18,6 +18,7 @@ import {
   User,
   Gamepad2,
   Grid3x3,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/layout/sidebar-context";
@@ -46,6 +47,7 @@ const exploreNavItems = [
 
 const shareNavItems = [
   { href: "/stats-card/recap", icon: CreditCard, label: "Recap Card" },
+  { href: "/public-profile", icon: Globe, label: "Public Profile" },
 ];
 
 const gameNavItems = [

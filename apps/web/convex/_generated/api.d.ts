@@ -12,6 +12,8 @@ import type * as account from "../account.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as nowPlaying from "../nowPlaying.js";
+import type * as nowPlayingCache from "../nowPlayingCache.js";
+import type * as publicProfiles from "../publicProfiles.js";
 import type * as spotify_tokenHelper from "../spotify/tokenHelper.js";
 import type * as spotifyLive from "../spotifyLive.js";
 import type * as topHistory from "../topHistory.js";
@@ -28,6 +30,8 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
   nowPlaying: typeof nowPlaying;
+  nowPlayingCache: typeof nowPlayingCache;
+  publicProfiles: typeof publicProfiles;
   "spotify/tokenHelper": typeof spotify_tokenHelper;
   spotifyLive: typeof spotifyLive;
   topHistory: typeof topHistory;
