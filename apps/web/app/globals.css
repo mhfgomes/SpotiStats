@@ -116,3 +116,9 @@
   font-display: swap;
   src: url('https://fonts.gstatic.com/s/geistmono/v6/or3nQ6H-1_WfwkMZI_qYFrcdmhHkjko.woff2') format('woff2');
 }
+
+/* Public profile now-playing equalizer: bars scale from --min to full height */
+@keyframes np-eq {
+  0%, 100% { transform: scaleY(var(--min, 0.2)); }
+  50% { transform: scaleY(1); }
+}

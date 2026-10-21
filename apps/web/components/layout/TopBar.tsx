@@ -26,6 +26,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/stats-card/compact": "Compact Card",
   "/stats-card/now-playing": "Now Playing Banner",
   "/stats-card/recap": "Recap Card",
+  "/public-profile": "Public Profile",
   "/cover-stack": "Cover Stack",
   "/pixel-reveal": "Album Pixel Reveal",
 };
